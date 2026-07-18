@@ -9,8 +9,12 @@
 <link rel="canonical" href="https://rock903400-byte.github.io/tao-tea-house/">
 
 <!-- Favicon -->
-<link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+<link rel="icon" type="image/jpeg" href="assets/logo-sm.jpg" sizes="64x64">
+<link rel="icon" type="image/webp" href="assets/logo-sm.webp" sizes="64x64">
 <link rel="apple-touch-icon" href="assets/logo.jpg">
+
+<!-- Preload critical hero image (LCP) -->
+<link rel="preload" as="image" href="assets/hero.webp" type="image/webp" fetchpriority="high">
 
 <!-- Open Graph -->
 <meta property="og:title" content="陶茶雅舍｜台南陶藝教室・茶藝教學">
@@ -55,7 +59,10 @@
 <nav class="navbar">
   <div class="container navbar__inner">
     <a href="#hero" class="navbar__logo">
-      <img src="assets/logo.jpg" alt="陶茶雅舍 Logo">
+      <picture>
+        <source type="image/webp" srcset="assets/logo-sm.webp 64w, assets/logo.webp 200w, assets/logo-2x.webp 400w" sizes="44px">
+        <img src="assets/logo.jpg" srcset="assets/logo-sm.jpg 64w, assets/logo.jpg 200w, assets/logo-2x.jpg 400w" sizes="44px" alt="陶茶雅舍 Logo" width="200" height="200" decoding="async">
+      </picture>
       <span class="navbar__logo-text">
         <span class="navbar__logo-zh">陶茶雅舍</span>
         <span class="navbar__logo-en">Tao · Tea · Art House</span>
@@ -110,7 +117,10 @@
         </div>
       </div>
       <div class="about__image fade-in">
-        <img src="assets/tea-welcome.jpg" alt="陶茶雅舍迎賓茶席" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="assets/tea-welcome-sm.webp 480w, assets/tea-welcome.webp 800w, assets/tea-welcome-2x.webp 1200w" sizes="(max-width: 980px) 100vw, 50vw">
+          <img src="assets/tea-welcome.jpg" srcset="assets/tea-welcome-sm.jpg 480w, assets/tea-welcome.jpg 800w, assets/tea-welcome-2x.jpg 1200w" sizes="(max-width: 980px) 100vw, 50vw" alt="陶茶雅舍迎賓茶席" loading="lazy" width="800" height="1422" decoding="async">
+        </picture>
       </div>
     </div>
   </div>
@@ -125,7 +135,10 @@
     <div class="teachers-couple">
       <div class="teachers-couple__photo fade-in">
         <span class="teachers-couple__badge">夫妻檔・30 餘年</span>
-        <img src="assets/teachers.jpg" alt="田清標老師與江秝笙老師夫妻合照" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="assets/teachers-sm.webp 480w, assets/teachers.webp 800w, assets/teachers-2x.webp 1200w" sizes="(max-width: 720px) 100vw, 560px">
+          <img src="assets/teachers.jpg" srcset="assets/teachers-sm.jpg 480w, assets/teachers.jpg 800w, assets/teachers-2x.jpg 1200w" sizes="(max-width: 720px) 100vw, 560px" alt="田清標老師與江秝笙老師夫妻合照" loading="lazy" width="800" height="600" decoding="async">
+        </picture>
       </div>
 
       <div class="teachers-couple__grid">
@@ -189,7 +202,10 @@
     <article class="course-card fade-in">
       <div class="course-card__image">
         <span class="course-card__badge">🔥 熱烈報名中</span>
-        <img src="assets/class-tea.jpg" alt="識茶學體驗課上課實況" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="assets/class-tea-sm.webp 480w, assets/class-tea.webp 800w, assets/class-tea-2x.webp 1200w" sizes="(max-width: 980px) 100vw, 500px">
+          <img src="assets/class-tea.jpg" srcset="assets/class-tea-sm.jpg 480w, assets/class-tea.jpg 800w, assets/class-tea-2x.jpg 1200w" sizes="(max-width: 980px) 100vw, 500px" alt="識茶學體驗課上課實況" loading="lazy" width="800" height="450" decoding="async">
+        </picture>
       </div>
       <div class="course-card__body">
         <p class="course-card__tag">✦ 茶藝入門體驗</p>
@@ -225,19 +241,31 @@
 
     <div class="real-grid">
       <div class="real-item fade-in">
-        <img src="assets/class-tea.jpg" alt="識茶學上課情形" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="assets/class-tea-sm.webp 480w, assets/class-tea.webp 800w" sizes="(max-width: 980px) 50vw, 25vw">
+          <img src="assets/class-tea.jpg" srcset="assets/class-tea-sm.jpg 480w, assets/class-tea.jpg 800w" sizes="(max-width: 980px) 50vw, 25vw" alt="識茶學上課情形" loading="lazy" width="800" height="450" decoding="async">
+        </picture>
         <div class="real-item__caption"><strong>識茶學</strong>講解茶葉知識與泡茶技巧</div>
       </div>
       <div class="real-item fade-in">
-        <img src="assets/class-pottery.jpg" alt="陶藝課上課情形" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="assets/class-pottery-sm.webp 480w, assets/class-pottery.webp 800w" sizes="(max-width: 980px) 50vw, 25vw">
+          <img src="assets/class-pottery.jpg" srcset="assets/class-pottery-sm.jpg 480w, assets/class-pottery.jpg 800w" sizes="(max-width: 980px) 50vw, 25vw" alt="陶藝課上課情形" loading="lazy" width="800" height="450" decoding="async">
+        </picture>
         <div class="real-item__caption"><strong>陶藝課</strong>學員專注聆聽創作要領</div>
       </div>
       <div class="real-item fade-in">
-        <img src="assets/student-1.jpg" alt="學員捏陶過程" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="assets/student-1-sm.webp 480w, assets/student-1.webp 800w" sizes="(max-width: 980px) 50vw, 25vw">
+          <img src="assets/student-1.jpg" srcset="assets/student-1-sm.jpg 480w, assets/student-1.jpg 800w" sizes="(max-width: 980px) 50vw, 25vw" alt="學員捏陶過程" loading="lazy" width="800" height="450" decoding="async">
+        </picture>
         <div class="real-item__caption"><strong>手捏壺</strong>學員親手塑形、感受泥土溫度</div>
       </div>
       <div class="real-item fade-in">
-        <img src="assets/student-2.jpg" alt="師母在旁指導" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="assets/student-2-sm.webp 480w, assets/student-2.webp 800w" sizes="(max-width: 980px) 50vw, 25vw">
+          <img src="assets/student-2.jpg" srcset="assets/student-2-sm.jpg 480w, assets/student-2.jpg 800w" sizes="(max-width: 980px) 50vw, 25vw" alt="師母在旁指導" loading="lazy" width="800" height="450" decoding="async">
+        </picture>
         <div class="real-item__caption"><strong>個別指導</strong>江秝笙老師親自示範修正</div>
       </div>
     </div>
@@ -252,16 +280,28 @@
 
     <div class="gallery__grid">
       <div class="gallery__item fade-in">
-        <img src="assets/works-1.jpg" alt="手捏壺作品 1" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="assets/works-1-sm.webp 480w, assets/works-1.webp 800w, assets/works-1-2x.webp 1200w" sizes="(max-width: 720px) 50vw, 33vw">
+          <img src="assets/works-1.jpg" srcset="assets/works-1-sm.jpg 480w, assets/works-1.jpg 800w, assets/works-1-2x.jpg 1200w" sizes="(max-width: 720px) 50vw, 33vw" alt="手捏壺作品 1" loading="lazy" width="800" height="600" decoding="async">
+        </picture>
       </div>
       <div class="gallery__item fade-in">
-        <img src="assets/works-2.jpg" alt="手捏壺作品 2" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="assets/works-2-sm.webp 480w, assets/works-2.webp 800w, assets/works-2-2x.webp 1200w" sizes="(max-width: 720px) 50vw, 33vw">
+          <img src="assets/works-2.jpg" srcset="assets/works-2-sm.jpg 480w, assets/works-2.jpg 800w, assets/works-2-2x.jpg 1200w" sizes="(max-width: 720px) 50vw, 33vw" alt="手捏壺作品 2" loading="lazy" width="800" height="600" decoding="async">
+        </picture>
       </div>
       <div class="gallery__item fade-in">
-        <img src="assets/works-3.jpg" alt="手捏壺作品 3" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="assets/works-3-sm.webp 480w, assets/works-3.webp 800w, assets/works-3-2x.webp 1200w" sizes="(max-width: 720px) 50vw, 33vw">
+          <img src="assets/works-3.jpg" srcset="assets/works-3-sm.jpg 480w, assets/works-3.jpg 800w, assets/works-3-2x.jpg 1200w" sizes="(max-width: 720px) 50vw, 33vw" alt="手捏壺作品 3" loading="lazy" width="800" height="450" decoding="async">
+        </picture>
       </div>
       <div class="gallery__item fade-in">
-        <img src="assets/works-4.jpg" alt="手捏壺作品 4" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="assets/works-4-sm.webp 480w, assets/works-4.webp 800w, assets/works-4-2x.webp 1200w" sizes="(max-width: 720px) 50vw, 33vw">
+          <img src="assets/works-4.jpg" srcset="assets/works-4-sm.jpg 480w, assets/works-4.jpg 800w, assets/works-4-2x.jpg 1200w" sizes="(max-width: 720px) 50vw, 33vw" alt="手捏壺作品 4" loading="lazy" width="800" height="600" decoding="async">
+        </picture>
       </div>
     </div>
 

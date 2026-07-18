@@ -8,8 +8,12 @@
 <link rel="canonical" href="https://rock903400-byte.github.io/tao-tea-house/course-tea.html">
 
 <!-- Favicon -->
-<link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+<link rel="icon" type="image/jpeg" href="assets/logo-sm.jpg" sizes="64x64">
+<link rel="icon" type="image/webp" href="assets/logo-sm.webp" sizes="64x64">
 <link rel="apple-touch-icon" href="assets/logo.jpg">
+
+<!-- Preload hero bg (LCP) -->
+<link rel="preload" as="image" href="assets/hero.webp" type="image/webp" fetchpriority="high">
 
 <!-- Open Graph -->
 <meta property="og:title" content="識茶學體驗課（有保固）｜8/9 限 6 名｜陶茶雅舍">
@@ -61,7 +65,10 @@
 <nav class="navbar">
   <div class="container navbar__inner">
     <a href="index.html" class="navbar__logo">
-      <img src="assets/logo.jpg" alt="陶茶雅舍 Logo">
+      <picture>
+        <source type="image/webp" srcset="assets/logo-sm.webp 64w, assets/logo.webp 200w, assets/logo-2x.webp 400w" sizes="44px">
+        <img src="assets/logo.jpg" srcset="assets/logo-sm.jpg 64w, assets/logo.jpg 200w, assets/logo-2x.jpg 400w" sizes="44px" alt="陶茶雅舍 Logo" width="200" height="200" decoding="async">
+      </picture>
       <span class="navbar__logo-text">
         <span class="navbar__logo-zh">陶茶雅舍</span>
         <span class="navbar__logo-en">Tao · Tea · Art House</span>
@@ -167,19 +174,31 @@
 
     <div class="real-grid">
       <div class="real-item fade-in">
-        <img src="assets/class-tea.jpg" alt="識茶學上課情形" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="assets/class-tea-sm.webp 480w, assets/class-tea.webp 800w" sizes="(max-width: 980px) 50vw, 25vw">
+          <img src="assets/class-tea.jpg" srcset="assets/class-tea-sm.jpg 480w, assets/class-tea.jpg 800w" sizes="(max-width: 980px) 50vw, 25vw" alt="識茶學上課情形" loading="lazy" width="800" height="450" decoding="async">
+        </picture>
         <div class="real-item__caption"><strong>識茶學</strong>講解茶葉知識與泡茶技巧</div>
       </div>
       <div class="real-item fade-in">
-        <img src="assets/tea-welcome.jpg" alt="迎賓茶席" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="assets/tea-welcome-sm.webp 480w, assets/tea-welcome.webp 800w" sizes="(max-width: 980px) 50vw, 25vw">
+          <img src="assets/tea-welcome.jpg" srcset="assets/tea-welcome-sm.jpg 480w, assets/tea-welcome.jpg 800w" sizes="(max-width: 980px) 50vw, 25vw" alt="迎賓茶席" loading="lazy" width="800" height="1422" decoding="async">
+        </picture>
         <div class="real-item__caption"><strong>迎賓茶席</strong>靜心體驗茶的儀式感</div>
       </div>
       <div class="real-item fade-in">
-        <img src="assets/student-2.jpg" alt="老師在旁指導" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="assets/student-2-sm.webp 480w, assets/student-2.webp 800w" sizes="(max-width: 980px) 50vw, 25vw">
+          <img src="assets/student-2.jpg" srcset="assets/student-2-sm.jpg 480w, assets/student-2.jpg 800w" sizes="(max-width: 980px) 50vw, 25vw" alt="老師在旁指導" loading="lazy" width="800" height="450" decoding="async">
+        </picture>
         <div class="real-item__caption"><strong>個別指導</strong>小班教學，老師親自示範</div>
       </div>
       <div class="real-item fade-in">
-        <img src="assets/student-1.jpg" alt="學員實作" loading="lazy">
+        <picture>
+          <source type="image/webp" srcset="assets/student-1-sm.webp 480w, assets/student-1.webp 800w" sizes="(max-width: 980px) 50vw, 25vw">
+          <img src="assets/student-1.jpg" srcset="assets/student-1-sm.jpg 480w, assets/student-1.jpg 800w" sizes="(max-width: 980px) 50vw, 25vw" alt="學員實作" loading="lazy" width="800" height="450" decoding="async">
+        </picture>
         <div class="real-item__caption"><strong>實作練習</strong>現場操作、立即修正</div>
       </div>
     </div>

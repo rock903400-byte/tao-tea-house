@@ -124,6 +124,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .navbar__logo img {
   height: 44px;
   width: auto;
+  display: block;
 }
 .navbar__logo-text {
   display: flex;
@@ -199,6 +200,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   position: absolute;
   inset: 0;
   background-image: url('../assets/hero.jpg');
+  background-image: image-set(
+    url('../assets/hero-sm.webp') type('image/webp') 1x,
+    url('../assets/hero.webp') type('image/webp') 2x,
+    url('../assets/hero-sm.jpg') type('image/jpeg') 1x,
+    url('../assets/hero.jpg') type('image/jpeg') 2x
+  );
   background-size: cover;
   background-position: center;
   filter: brightness(0.45);
@@ -1094,6 +1101,14 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   position: absolute;
   inset: 0;
   background: url('../assets/hero.jpg') center/cover;
+  background-image: image-set(
+    url('../assets/hero-sm.webp') type('image/webp') 1x,
+    url('../assets/hero.webp') type('image/webp') 2x,
+    url('../assets/hero-sm.jpg') type('image/jpeg') 1x,
+    url('../assets/hero.jpg') type('image/jpeg') 2x
+  );
+  background-position: center;
+  background-size: cover;
   opacity: 0.15;
 }
 .page-hero__content { position: relative; z-index: 1; }
