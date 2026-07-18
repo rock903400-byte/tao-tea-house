@@ -1,0 +1,20 @@
+# 作業系統檔案
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# 編輯器 / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 暫存與記錄檔
+*.log
+*.tmp
+.cache/
+
+# 作業系統隱藏資料夾
+__MACOSX/

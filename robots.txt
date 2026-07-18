@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rock903400-byte.github.io/tao-tea-house/sitemap.xml
