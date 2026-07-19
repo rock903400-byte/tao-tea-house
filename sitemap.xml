@@ -1,15 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://rock903400-byte.github.io/tao-tea-house/</loc>
-    <lastmod>2026-07-18T20:40:00+08:00</lastmod>
+    <lastmod>2026-07-19T12:00:00+08:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://rock903400-byte.github.io/tao-tea-house/assets/hero.jpg</image:loc>
+      <image:title>陶茶雅舍品牌主視覺 - 在泥與火之間找回生活的溫度</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://rock903400-byte.github.io/tao-tea-house/assets/logo.jpg</image:loc>
+      <image:title>陶茶雅舍 Logo - 台南陶藝教室</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://rock903400-byte.github.io/tao-tea-house/assets/tea-welcome.jpg</image:loc>
+      <image:title>陶茶雅舍迎賓茶席 - 台南新營品茶空間</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://rock903400-byte.github.io/tao-tea-house/assets/teachers.jpg</image:loc>
+      <image:title>田清標老師與江秝笙老師夫妻合照 - 台南陶藝教室創辦人</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://rock903400-byte.github.io/tao-tea-house/assets/class-tea.jpg</image:loc>
+      <image:title>陶茶雅舍識茶學體驗課上課實況 - 台南茶藝教學</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://rock903400-byte.github.io/tao-tea-house/assets/class-pottery.jpg</image:loc>
+      <image:title>陶藝課上課情形 - 新營陶藝教室學員專注創作</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://rock903400-byte.github.io/tao-tea-house/assets/student-1.jpg</image:loc>
+      <image:title>學員手捏壺過程 - 台南陶藝體驗</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://rock903400-byte.github.io/tao-tea-house/assets/student-2.jpg</image:loc>
+      <image:title>江秝笙老師親自示範指導學員手捏壺</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://rock903400-byte.github.io/tao-tea-house/assets/works-1.jpg</image:loc>
+      <image:title>田清標老師手捏茶壺作品 - 桃城手捏壺學會聯展</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://rock903400-byte.github.io/tao-tea-house/assets/works-2.jpg</image:loc>
+      <image:title>手捏壺陶藝作品 - 田清標老師與江秝笙老師創作</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://rock903400-byte.github.io/tao-tea-house/assets/works-3.jpg</image:loc>
+      <image:title>手捏茶壺作品 - 南投文化中心參展陶藝</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://rock903400-byte.github.io/tao-tea-house/assets/works-4.jpg</image:loc>
+      <image:title>手作陶藝壺器 - 台南陶藝教室學員創作</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://rock903400-byte.github.io/tao-tea-house/course-tea.html</loc>
-    <lastmod>2026-07-18T20:40:00+08:00</lastmod>
+    <lastmod>2026-07-19T12:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://rock903400-byte.github.io/tao-tea-house/assets/class-tea.jpg</image:loc>
+      <image:title>識茶學上課情形 - 台南茶藝教室實況</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://rock903400-byte.github.io/tao-tea-house/assets/tea-welcome.jpg</image:loc>
+      <image:title>陶茶雅舍迎賓茶席 - 新營品茶空間</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://rock903400-byte.github.io/tao-tea-house/assets/student-2.jpg</image:loc>
+      <image:title>江秝笙老師手把手指導學員手捏壺</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://rock903400-byte.github.io/tao-tea-house/assets/student-1.jpg</image:loc>
+      <image:title>學員手捏壺實作 - 台南陶藝體驗課</image:title>
+    </image:image>
   </url>
 </urlset>
