@@ -1,4 +1,26 @@
 User-agent: *
 Allow: /
 
+# 顯式允許 AI 搜尋引擎與聊天機器人爬蟲
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
 Sitemap: https://rock903400-byte.github.io/tao-tea-house/sitemap.xml
