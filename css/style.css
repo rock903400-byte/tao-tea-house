@@ -1243,12 +1243,18 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   font-size: 1.3rem;
   letter-spacing: 0.08em;
 }
+.signup-card__header p.signup-card__title {
+  color: var(--color-secondary);
+}
 .signup-card__price {
   margin-top: 8px;
   color: var(--color-accent);
   font-size: 2rem;
   font-family: var(--font-heading);
   font-weight: 700;
+}
+.signup-card__header p.signup-card__price {
+  color: var(--color-accent);
 }
 .signup-card__price small {
   font-size: 0.85rem;
