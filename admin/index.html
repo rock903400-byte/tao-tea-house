@@ -67,9 +67,15 @@ td .link-btn:hover{background:#efe9dc}
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .table-wrap table{min-width:560px}
 
+/* ---- 表單：雙欄 grid（基礎規則需在媒體查詢之前，供手機覆寫） ---- */
+#modalForm{flex:1;overflow-y:auto;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:0 18px;align-content:start}
+#modalForm .f{min-width:0}
+#modalForm .f--full{grid-column:1/-1}
+
 /* ---- 手機：表格轉卡片 ---- */
 @media(max-width:640px){
   #mainView{padding:14px 10px 50px}
+  #modalForm{grid-template-columns:1fr}
   .topbar{flex-wrap:wrap}
   .topbar .who{width:100%;order:3}
   .table-wrap{overflow:visible}
@@ -90,9 +96,9 @@ td .link-btn:hover{background:#efe9dc}
 }
 
 /* ---- 表單 ---- */
-.modal-bg{position:fixed;inset:0;background:rgba(26,46,38,.55);display:flex;align-items:flex-start;justify-content:center;padding:30px 16px;z-index:50;overflow:auto}
-.modal{background:var(--surface);border-radius:12px;width:100%;max-width:640px;padding:24px 26px;margin:auto 0}
-.modal h3{font-size:17px;color:var(--primary-dark);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.modal-bg{position:fixed;inset:0;background:rgba(26,46,38,.55);display:flex;align-items:center;justify-content:center;padding:30px 16px;z-index:50;overflow:auto}
+.modal{background:var(--surface);border-radius:12px;width:100%;max-width:720px;padding:24px 26px;margin:auto 0;display:flex;flex-direction:column;max-height:calc(100dvh - 60px)}
+.modal h3{font-size:17px;color:var(--primary-dark);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
 .modal h3 .x{cursor:pointer;color:var(--text-soft);font-size:22px;line-height:1}
 .modal label{display:block;font-size:13px;font-weight:bold;color:var(--text-soft);margin:12px 0 4px}
 .modal input[type=text],.modal input[type=number],.modal input[type=url],.modal input[type=email],.modal input[type=tel],.modal textarea,.modal select{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit}
@@ -100,7 +106,7 @@ td .link-btn:hover{background:#efe9dc}
 .modal input[type=file]{font-size:13px}
 .modal .check{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:14px}
 .modal .check input{width:17px;height:17px}
-.modal-btns{display:flex;gap:10px;margin-top:20px}
+.modal-btns{display:flex;gap:10px;margin-top:20px;flex-shrink:0}
 .modal-btns button{flex:1;padding:11px;border-radius:8px;font-size:15px;font-weight:bold;cursor:pointer}
 .modal-btns .save{background:var(--primary);color:#fff;border:0}
 .modal-btns .save:hover{background:var(--primary-dark)}
@@ -444,6 +450,8 @@ function openForm(k,id){
   RESOURCES[k].fields.forEach(function(f){
     var v=row?row[f.name]:null;
     var val=v==null?"":v;
+    var full=f.type==="image"||f.type==="textarea";
+    html+='<div class="f'+(full?' f--full':'')+'">';
     if(f.type==="image"){
       html+='<label>'+f.label+(f.required?' *':'')+'</label>';
       html+='<input type="file" accept="image/*" data-field="'+f.name+'">';
@@ -463,6 +471,7 @@ function openForm(k,id){
     else{
       html+='<label>'+f.label+(f.required?' *':'')+'</label><input type="text" data-field="'+f.name+'" value="'+esc(val)+'" '+(f.type==="url"?'inputmode="url"':'')+'>';
     }
+    html+='</div>';
   });
   $("modalForm").innerHTML=html;
   $("modalBg").classList.remove("hidden");
