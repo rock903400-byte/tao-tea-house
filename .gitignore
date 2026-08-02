@@ -27,3 +27,8 @@ backend/.dev.vars
 
 # 作業系統隱藏資料夾
 __MACOSX/
+
+# Node.js / 工具鏈
+node_modules/
+npm-debug.log*
+.eslintcache

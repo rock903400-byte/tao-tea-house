@@ -19,7 +19,22 @@ const ALLOWED_ORIGINS = [
 
 const RESOURCES = {
   courses: {
-    fields: ["title", "tag", "subtitle", "description", "date", "time", "fee", "capacity", "bonus", "location", "signup_url", "image", "published", "sort_order"],
+    fields: [
+      "title",
+      "tag",
+      "subtitle",
+      "description",
+      "date",
+      "time",
+      "fee",
+      "capacity",
+      "bonus",
+      "location",
+      "signup_url",
+      "image",
+      "published",
+      "sort_order",
+    ],
   },
   teachers: {
     fields: ["name", "title", "bio", "image", "sort_order"],
@@ -58,17 +73,13 @@ function corsHeaders(origin) {
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, X-File-Name",
     "Access-Control-Max-Age": "86400",
-    "Vary": "Origin",
+    Vary: "Origin",
   };
 }
 
 function cleanValue(v) {
   if (v === null || v === undefined) return "";
   return String(v).trim();
-}
-
-function cleanBoolean(v) {
-  return v ? 1 : 0;
 }
 
 /* ---------------- 認證工具 ---------------- */
@@ -91,7 +102,7 @@ export async function verifySession(env, request) {
   const row = await env.DB.prepare(
     `SELECT s.id AS session_id, s.expires_at, a.id AS admin_id, a.email, a.name
      FROM sessions s JOIN admins a ON a.id = s.admin_id
-     WHERE s.token = ? AND s.expires_at > datetime('now')`,
+     WHERE s.token = ? AND s.expires_at > datetime('now')`
   )
     .bind(token)
     .first();
@@ -107,24 +118,20 @@ function clearSessionCookie() {
 }
 
 async function hashPassword(password, saltHex) {
-  const salt = Uint8Array.from(
-    saltHex.match(/.{2}/g).map((b) => parseInt(b, 16)),
-  );
+  const salt = Uint8Array.from(saltHex.match(/.{2}/g).map((b) => parseInt(b, 16)));
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(password),
     { name: "PBKDF2" },
     false,
-    ["deriveBits"],
+    ["deriveBits"]
   );
   const bits = await crypto.subtle.deriveBits(
     { name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" },
     key,
-    256,
+    256
   );
-  return [...new Uint8Array(bits)]
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+  return [...new Uint8Array(bits)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 function newSalt() {
@@ -136,7 +143,7 @@ async function createSession(env, adminId) {
   const token = crypto.randomUUID();
   await env.DB.prepare(
     `INSERT INTO sessions (token, admin_id, expires_at)
-     VALUES (?, ?, datetime('now', '+' || ? || ' days'))`,
+     VALUES (?, ?, datetime('now', '+' || ? || ' days'))`
   )
     .bind(token, adminId, SESSION_DAYS)
     .run();
@@ -146,24 +153,18 @@ async function createSession(env, adminId) {
 async function deleteSession(env, request) {
   const token = getCookie(request, COOKIE_NAME);
   if (token) {
-    await env.DB.prepare("DELETE FROM sessions WHERE token = ?")
-      .bind(token)
-      .run();
+    await env.DB.prepare("DELETE FROM sessions WHERE token = ?").bind(token).run();
   }
 }
 
 function clientKey(request) {
   return (
-    request.headers.get("CF-Connecting-IP") ||
-    request.headers.get("X-Forwarded-For") ||
-    "unknown"
+    request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For") || "unknown"
   );
 }
 
 async function getFailCount(env, key) {
-  const row = await env.DB.prepare(
-    "SELECT count, updated_at FROM login_attempts WHERE key = ?",
-  )
+  const row = await env.DB.prepare("SELECT count, updated_at FROM login_attempts WHERE key = ?")
     .bind(key)
     .first();
   if (!row) return 0;
@@ -178,7 +179,7 @@ async function recordFailure(env, key) {
     `INSERT INTO login_attempts (key, count, updated_at) VALUES (?, 1, ?)
      ON CONFLICT(key) DO UPDATE SET
        count = CASE WHEN ? - updated_at > ? THEN 1 ELSE count + 1 END,
-       updated_at = ?`,
+       updated_at = ?`
   )
     .bind(key, now, now, RATE_WINDOW, now)
     .run();
@@ -209,9 +210,7 @@ async function handleLogin(request, env) {
     return json({ ok: false, error: "請輸入帳號與密碼" }, 400);
   }
 
-  const admin = await env.DB.prepare("SELECT * FROM admins WHERE email = ?")
-    .bind(email)
-    .first();
+  const admin = await env.DB.prepare("SELECT * FROM admins WHERE email = ?").bind(email).first();
   if (!admin) {
     await recordFailure(env, key);
     return json({ ok: false, error: "帳號或密碼錯誤" }, 401);
@@ -225,11 +224,9 @@ async function handleLogin(request, env) {
 
   await clearFailures(env, key);
   const token = await createSession(env, admin.id);
-  return json(
-    { ok: true, name: admin.name, email: admin.email },
-    200,
-    { "Set-Cookie": setSessionCookie(token) },
-  );
+  return json({ ok: true, name: admin.name, email: admin.email }, 200, {
+    "Set-Cookie": setSessionCookie(token),
+  });
 }
 
 async function handleLogout(request, env) {
@@ -286,16 +283,17 @@ async function handleChangePassword(request, env) {
 /* ---------------- 公開資料 ---------------- */
 
 async function handlePublicData(env) {
-  const [courses, teachers, exhibitions, media, services, works, settingsRows] =
-    await Promise.all([
-      env.DB.prepare("SELECT * FROM courses WHERE published = 1 ORDER BY sort_order ASC, id DESC").all(),
-      env.DB.prepare("SELECT * FROM teachers ORDER BY sort_order ASC, id ASC").all(),
-      env.DB.prepare("SELECT * FROM exhibitions ORDER BY sort_order ASC, id ASC").all(),
-      env.DB.prepare("SELECT * FROM media ORDER BY sort_order ASC, id ASC").all(),
-      env.DB.prepare("SELECT * FROM services ORDER BY sort_order ASC, id ASC").all(),
-      env.DB.prepare("SELECT * FROM works ORDER BY sort_order ASC, id ASC").all(),
-      env.DB.prepare("SELECT key, value FROM settings").all(),
-    ]);
+  const [courses, teachers, exhibitions, media, services, works, settingsRows] = await Promise.all([
+    env.DB.prepare(
+      "SELECT * FROM courses WHERE published = 1 ORDER BY sort_order ASC, id DESC"
+    ).all(),
+    env.DB.prepare("SELECT * FROM teachers ORDER BY sort_order ASC, id ASC").all(),
+    env.DB.prepare("SELECT * FROM exhibitions ORDER BY sort_order ASC, id ASC").all(),
+    env.DB.prepare("SELECT * FROM media ORDER BY sort_order ASC, id ASC").all(),
+    env.DB.prepare("SELECT * FROM services ORDER BY sort_order ASC, id ASC").all(),
+    env.DB.prepare("SELECT * FROM works ORDER BY sort_order ASC, id ASC").all(),
+    env.DB.prepare("SELECT key, value FROM settings").all(),
+  ]);
 
   const settings = {};
   for (const row of settingsRows.results) settings[row.key] = row.value;
@@ -318,8 +316,10 @@ function sanitizeBody(body, resource) {
   const out = {};
   for (const field of def.fields) {
     if (body[field] === undefined) continue;
-    if (field === "published" || field === "sort_order") {
-      out[field] = cleanBoolean(body[field]) || parseInt(body[field], 10) || 0;
+    if (field === "sort_order") {
+      out[field] = parseInt(body[field], 10) || 0;
+    } else if (field === "published") {
+      out[field] = body[field] ? 1 : 0;
     } else {
       out[field] = cleanValue(body[field]);
     }
@@ -329,7 +329,7 @@ function sanitizeBody(body, resource) {
 
 async function handleList(resource, env) {
   const rows = await env.DB.prepare(
-    `SELECT * FROM ${resource} ORDER BY sort_order ASC, id ASC`,
+    `SELECT * FROM ${resource} ORDER BY sort_order ASC, id ASC`
   ).all();
   return json(rows.results);
 }
@@ -348,7 +348,7 @@ async function handleCreate(resource, request, env) {
   const placeholders = cols.map(() => "?").join(", ");
   const values = cols.map((c) => data[c]);
   const result = await env.DB.prepare(
-    `INSERT INTO ${resource} (${cols.join(", ")}) VALUES (${placeholders})`,
+    `INSERT INTO ${resource} (${cols.join(", ")}) VALUES (${placeholders})`
   )
     .bind(...values)
     .run();
@@ -396,7 +396,7 @@ async function handleSettingsUpdate(request, env) {
   for (const [key, value] of Object.entries(body)) {
     await env.DB.prepare(
       `INSERT INTO settings (key, value) VALUES (?, ?)
-       ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+       ON CONFLICT(key) DO UPDATE SET value = excluded.value`
     )
       .bind(key, cleanValue(value))
       .run();
@@ -454,7 +454,7 @@ async function handleImage(request, env, pathname) {
 
 /* ---------------- 路由 ---------------- */
 
-async function handleRequest(request, env, ctx) {
+async function handleRequest(request, env) {
   const url = new URL(request.url);
   const pathname = url.pathname;
   const origin = request.headers.get("Origin");
@@ -519,7 +519,9 @@ async function handleRequest(request, env, ctx) {
     }
 
     /* 資源 CRUD */
-    const match = pathname.match(/^\/api\/(courses|teachers|exhibitions|media|services|works)(?:\/(\d+))?$/);
+    const match = pathname.match(
+      /^\/api\/(courses|teachers|exhibitions|media|services|works)(?:\/(\d+))?$/
+    );
     if (match) {
       const resource = match[1];
       const id = match[2];

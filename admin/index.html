@@ -235,7 +235,7 @@ function compressImage(file){
           if(blob&&blob.size<file.size){resolve(new File([blob],file.name.replace(/\.[^.]+$/,"")+".jpg",{type:"image/jpeg"}));}
           else{resolve(file);}
         },"image/jpeg",0.82);
-      }catch(e){URL.revokeObjectURL(url);resolve(file);}
+      }catch{URL.revokeObjectURL(url);resolve(file);}
     };
     img.onerror=function(){URL.revokeObjectURL(url);resolve(file);};
     img.src=url;
@@ -367,6 +367,7 @@ function renderTable(k,panel){
 }
 
 /* ---- 排序調整（上移/下移 = 交換 sort_order） ---- */
+/* eslint-disable-next-line no-unused-vars */
 function moveRow(k,idx,dir){
   var rows=lists[k];if(!rows)return;
   var j=idx+dir;
@@ -383,6 +384,7 @@ function moveRow(k,idx,dir){
 }
 
 /* ---- 刪除 ---- */
+/* eslint-disable-next-line no-unused-vars */
 function delRow(k,id){
   if(!confirm("確定要刪除這筆資料嗎？刪除後無法復原。"))return;
   api("/api/"+k+"/"+id,{method:"DELETE"})
@@ -394,6 +396,7 @@ function delRow(k,id){
 var editingId=null;
 var editingKey=null;
 
+/* eslint-disable-next-line no-unused-vars */
 function openForm(k,id){
   editingKey=k;editingId=id==null?null:id;
   var row=null;
@@ -511,6 +514,7 @@ function loadSettings(){
     wrap.innerHTML=html;
   }).catch(function(e){wrap.innerHTML='<p class="empty">載入失敗：'+esc(e.message)+'</p>';});
 }
+/* eslint-disable-next-line no-unused-vars */
 function saveSettings(){
   var data={};
   document.querySelectorAll("#panel-settings [data-setting]").forEach(function(el){data[el.dataset.setting]=el.value;});

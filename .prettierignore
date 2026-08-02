@@ -1,0 +1,12 @@
+# 提供線上的靜態資源與本機狀態不格式化
+assets/
+backend/.wrangler/
+.wrangler/
+
+# 已部署 / 對外檔案不重排
+*.html
+css/
+
+# 第三方暫存
+node_modules/
+package-lock.json
