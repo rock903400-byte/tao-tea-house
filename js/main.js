@@ -42,13 +42,16 @@
     fadeTargets.forEach(el => el.classList.add('visible'));
   }
 
-  /* ---------- 4. Lightbox 作品放大 ---------- */
-  const galleryItems = document.querySelectorAll('.gallery__item');
+  /* ---------- 4. Lightbox 作品放大（可重入，供動態內容重綁） ---------- */
   const lightbox = document.querySelector('.lightbox');
   const lightboxImg = document.querySelector('.lightbox img');
 
-  if (galleryItems.length && lightbox && lightboxImg) {
+  function bindGallery() {
+    const galleryItems = document.querySelectorAll('.gallery__item');
+    if (!galleryItems.length || !lightbox || !lightboxImg) return;
     galleryItems.forEach(item => {
+      if (item.dataset.lightboxBound) return;
+      item.dataset.lightboxBound = '1';
       item.addEventListener('click', () => {
         const img = item.querySelector('img');
         if (!img) return;
@@ -58,6 +61,9 @@
         document.body.style.overflow = 'hidden';
       });
     });
+  }
+
+  if (lightbox && lightboxImg) {
     const closeLightbox = () => {
       lightbox.classList.remove('active');
       document.body.style.overflow = '';
@@ -67,6 +73,8 @@
       if (e.key === 'Escape') closeLightbox();
     });
   }
+  bindGallery();
+  window.__reinitGallery = bindGallery;
 
   /* ---------- 5. Smooth scroll ---------- */
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {

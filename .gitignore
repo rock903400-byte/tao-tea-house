@@ -16,5 +16,14 @@ ehthumbs.db
 *.tmp
 .cache/
 
+# Wrangler 本機狀態
+backend/.wrangler/
+.wrangler/
+
+# 環境變數（含敏感資料）
+backend/.dev.vars
+.env
+.env.local
+
 # 作業系統隱藏資料夾
 __MACOSX/

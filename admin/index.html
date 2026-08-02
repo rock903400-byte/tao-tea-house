@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>陶茶雅舍 · 管理後台</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+:root{--primary:#2C4A3E;--primary-dark:#1A2E26;--accent:#C9A961;--text:#2A2A2A;--text-soft:#6B6B6B;--bg:#F5F3EE;--surface:#fff;--border:#E3DCCD;--danger:#B71C1C;--ok:#1B5E20}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Microsoft JhengHei","PingFang TC",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.hidden{display:none!important}
+
+/* ---- 登入 ---- */
+#loginView{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:36px 32px;width:100%;max-width:380px;text-align:center}
+.login-card h1{font-size:22px;color:var(--primary);letter-spacing:1px;margin-bottom:4px}
+.login-card .brand{font-size:13px;color:var(--text-soft);margin-bottom:24px}
+.login-card label{display:block;text-align:left;font-size:13px;font-weight:bold;color:var(--text-soft);margin:14px 0 4px}
+.login-card input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:15px}
+.login-card button{margin-top:24px;width:100%;padding:12px;background:var(--primary);color:#fff;border:0;border-radius:8px;font-size:16px;font-weight:bold;cursor:pointer}
+.login-card button:hover{background:var(--primary-dark)}
+.login-card button:disabled{opacity:.5;cursor:not-allowed}
+.login-card .foot{font-size:12px;color:var(--text-soft);margin-top:16px}
+
+/* ---- 主框架 ---- */
+#mainView{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.topbar h1{font-size:20px;color:var(--primary)}
+.topbar .who{font-size:13px;color:var(--text-soft)}
+.topbar button{background:none;border:1px solid var(--border);color:var(--primary);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:14px}
+.topbar button:hover{background:#efe9dc}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.tabs button{padding:9px 16px;border:1px solid var(--border);background:var(--surface);border-radius:8px;font-size:14px;cursor:pointer;color:var(--text-soft);font-weight:bold}
+.tabs button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+.panel{display:none}
+.panel.active{display:block}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.panel-head h2{font-size:17px;color:var(--primary-dark)}
+.panel-head button{padding:9px 16px;background:var(--accent);color:var(--primary-dark);border:0;border-radius:8px;font-size:14px;font-weight:bold;cursor:pointer}
+.panel-head button:hover{filter:brightness(.95)}
+
+#msg{margin-bottom:14px;padding:10px 14px;border-radius:8px;font-size:14px;display:none}
+#msg.ok{display:block;background:#E8F5E9;color:var(--ok);border:1px solid #A5D6A7}
+#msg.err{display:block;background:#FDECEA;color:var(--danger);border:1px solid #EF9A9A}
+
+/* ---- 列表 ---- */
+table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+th,td{padding:10px 12px;text-align:left;font-size:14px;border-bottom:1px solid #F0EADA;vertical-align:middle}
+th{background:#EFE9DB;color:var(--primary-dark);font-size:13px;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td .thumb{width:56px;height:42px;object-fit:cover;border-radius:6px;display:block}
+td .icon-txt{font-size:26px}
+.rowbtns{display:flex;gap:6px}
+.rowbtns button{padding:5px 12px;border-radius:6px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:#fff}
+.rowbtns .up{border-color:#A5D6A7;color:var(--ok)}
+.rowbtns .down{border-color:#EF9A9A;color:var(--danger)}
+.rowbtns .edit{color:var(--primary);border-color:#B0C4BC}
+.rowbtns .del{color:var(--danger);border-color:#EF9A9A}
+.empty{color:var(--text-soft);font-size:14px;padding:20px;text-align:center;background:var(--surface);border:1px dashed var(--border);border-radius:10px}
+
+/* ---- 表單 ---- */
+.modal-bg{position:fixed;inset:0;background:rgba(26,46,38,.55);display:flex;align-items:flex-start;justify-content:center;padding:30px 16px;z-index:50;overflow:auto}
+.modal{background:var(--surface);border-radius:12px;width:100%;max-width:640px;padding:24px 26px;margin:auto 0}
+.modal h3{font-size:17px;color:var(--primary-dark);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.modal h3 .x{cursor:pointer;color:var(--text-soft);font-size:22px;line-height:1}
+.modal label{display:block;font-size:13px;font-weight:bold;color:var(--text-soft);margin:12px 0 4px}
+.modal input[type=text],.modal input[type=number],.modal input[type=url],.modal input[type=email],.modal input[type=tel],.modal textarea,.modal select{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit}
+.modal textarea{min-height:90px;resize:vertical}
+.modal input[type=file]{font-size:13px}
+.modal .check{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:14px}
+.modal .check input{width:17px;height:17px}
+.modal-btns{display:flex;gap:10px;margin-top:20px}
+.modal-btns button{flex:1;padding:11px;border-radius:8px;font-size:15px;font-weight:bold;cursor:pointer}
+.modal-btns .save{background:var(--primary);color:#fff;border:0}
+.modal-btns .save:hover{background:var(--primary-dark)}
+.modal-btns .cancel{background:#fff;border:1px solid var(--border);color:var(--text-soft)}
+.preview{display:none;margin-top:10px}
+.preview img{max-width:200px;max-height:130px;object-fit:cover;border-radius:8px;border:1px solid var(--border)}
+.img-note{font-size:12px;color:var(--text-soft);margin-top:5px}
+</style>
+</head>
+<body>
+
+<!-- ======== 登入 ======== -->
+<div id="loginView">
+  <div class="login-card">
+    <h1>陶茶雅舍</h1>
+    <p class="brand">管理後台 · 登入</p>
+    <label for="loginEmail">Email 帳號</label>
+    <input type="email" id="loginEmail" autocomplete="username" placeholder="name@example.com">
+    <label for="loginPassword">密碼</label>
+    <input type="password" id="loginPassword" autocomplete="current-password" placeholder="請輸入密碼">
+    <button id="btnLogin">登入</button>
+    <p class="foot" id="loginHint"></p>
+  </div>
+</div>
+
+<!-- ======== 主畫面 ======== -->
+<div id="mainView" class="hidden">
+  <div class="topbar">
+    <h1>陶茶雅舍 · 管理後台</h1>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span class="who" id="whoAmI"></span>
+      <button id="btnLogout">登出</button>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div id="msg"></div>
+  <div id="panels"></div>
+</div>
+
+<!-- ======== 表單 Modal ======== -->
+<div class="modal-bg hidden" id="modalBg">
+  <div class="modal">
+    <h3 id="modalTitle">新增</h3>
+    <div id="modalForm"></div>
+    <div class="modal-btns">
+      <button class="save" id="btnSave">儲存</button>
+      <button class="cancel" id="btnCancel">取消</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   陶茶雅舍 管理後台
+   對接 backend/src/worker.js（Cloudflare Worker + D1 + KV）
+   ============================================================ */
+
+var API_BASE = "https://tao-tea-house-api.rock903400.workers.dev"; /* 部署後更新 */
+
+/* ---- 資源定義（欄位 → 表單） ---- */
+var RESOURCES = {
+  courses: { label: "課程", fields: [
+    { name: "title", label: "課程名稱", type: "text", required: true },
+    { name: "tag", label: "標籤（如：茶藝入門體驗）", type: "text" },
+    { name: "subtitle", label: "副標題", type: "text" },
+    { name: "description", label: "課程介紹", type: "textarea" },
+    { name: "date", label: "日期（如：2026-08-09（日））", type: "text" },
+    { name: "time", label: "時間（如：下午 13:00～17:00）", type: "text" },
+    { name: "fee", label: "費用（如：$1,000 / 人）", type: "text" },
+    { name: "capacity", label: "名額（如：限 6 人）", type: "text" },
+    { name: "bonus", label: "報名好禮（如：送茶葉一包）", type: "text" },
+    { name: "location", label: "地點", type: "text" },
+    { name: "signup_url", label: "報名表單網址", type: "url" },
+    { name: "image", label: "課程圖片", type: "image" },
+    { name: "published", label: "在網站上顯示", type: "check", def: 1 },
+    { name: "sort_order", label: "排序（數字越小越前面）", type: "number" }
+  ]},
+  teachers: { label: "師資", fields: [
+    { name: "name", label: "姓名", type: "text", required: true },
+    { name: "title", label: "頭銜（如：壺藝達人｜創辦人）", type: "text" },
+    { name: "bio", label: "介紹", type: "textarea" },
+    { name: "image", label: "照片", type: "image" },
+    { name: "sort_order", label: "排序", type: "number" }
+  ]},
+  exhibitions: { label: "參展經歷", fields: [
+    { name: "year", label: "年度（如：114 年）", type: "text", required: true },
+    { name: "title", label: "展覽名稱", type: "text", required: true },
+    { name: "sort_order", label: "排序", type: "number" }
+  ]},
+  media: { label: "媒體報導", fields: [
+    { name: "type", label: "類型（如：新聞專訪）", type: "text" },
+    { name: "title", label: "標題", type: "text", required: true },
+    { name: "description", label: "摘要", type: "textarea" },
+    { name: "link", label: "連結網址", type: "url" },
+    { name: "sort_order", label: "排序", type: "number" }
+  ]},
+  services: { label: "服務項目", fields: [
+    { name: "icon", label: "圖示（emoji，如：🏺）", type: "text" },
+    { name: "name", label: "名稱", type: "text", required: true },
+    { name: "description", label: "說明", type: "textarea" },
+    { name: "sort_order", label: "排序", type: "number" }
+  ]},
+  works: { label: "作品展示", fields: [
+    { name: "image", label: "作品圖片", type: "image", required: true },
+    { name: "caption", label: "說明文字", type: "text" },
+    { name: "sort_order", label: "排序", type: "number" }
+  ]}
+};
+
+/* 聯絡資訊（settings）欄位 */
+var SETTING_FIELDS = [
+  { key: "address", label: "地址（完整）", type: "text" },
+  { key: "address_short", label: "地址（簡短）", type: "text" },
+  { key: "phone", label: "電話", type: "text" },
+  { key: "phone_href", label: "電話連結（如：tel:+886919897351）", type: "text" },
+  { key: "email", label: "Email", type: "text" },
+  { key: "facebook", label: "Facebook 網址", type: "text" },
+  { key: "hours", label: "營業時間說明", type: "text" },
+  { key: "map_query", label: "地圖搜尋關鍵字", type: "text" }
+];
+
+/* ---- 工具 ---- */
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function $(id){return document.getElementById(id);}
+function showMsg(t,ok){var m=$("msg");m.textContent=t;m.className=ok?"ok":"err";setTimeout(function(){m.className="";},4000);}
+
+/* ---- 圖片自動壓縮（沿用 boduosavings：>400KB 壓到長邊 1600、JPEG 0.82） ---- */
+function compressImage(file){
+  return new Promise(function(resolve){
+    if(file.size<400*1024){resolve(file);return;}
+    var img=new Image(),url=URL.createObjectURL(file);
+    img.onload=function(){
+      var MAX=1600,w=img.naturalWidth||1,h=img.naturalHeight||1;
+      var scale=Math.min(1,MAX/Math.max(w,h));
+      var canvas=document.createElement("canvas");
+      canvas.width=Math.round(w*scale);canvas.height=Math.round(h*scale);
+      try{
+        canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
+        canvas.toBlob(function(blob){
+          URL.revokeObjectURL(url);
+          if(blob&&blob.size<file.size){resolve(new File([blob],file.name.replace(/\.[^.]+$/,"")+".jpg",{type:"image/jpeg"}));}
+          else{resolve(file);}
+        },"image/jpeg",0.82);
+      }catch(e){URL.revokeObjectURL(url);resolve(file);}
+    };
+    img.onerror=function(){URL.revokeObjectURL(url);resolve(file);};
+    img.src=url;
+  });
+}
+function imgUrl(src){
+  if(!src)return "";
+  if(src.indexOf("/img/")===0)return API_BASE+src;
+  if(src.indexOf("http")===0)return src;
+  return "https://rock903400-byte.github.io/tao-tea-house/"+src;
+}
+
+/* ---- 認證 ---- */
+function api(path,opts){
+  opts=opts||{};
+  opts.credentials="include";
+  opts.headers=opts.headers||{};
+  if(opts.body&&!(opts.body instanceof FormData))opts.headers["Content-Type"]="application/json";
+  return fetch(API_BASE+path,opts).then(function(r){
+    return r.json().then(function(j){if(!r.ok)throw new Error(j.error||"請求失敗");return j;});
+  });
+}
+function login(){
+  var btn=$("btnLogin");btn.disabled=true;$("loginHint").textContent="登入中…";
+  var email=$("loginEmail").value.trim(),password=$("loginPassword").value;
+  fetch(API_BASE+"/api/auth/login",{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:email,password:password})})
+    .then(function(r){return r.json();})
+    .then(function(j){
+      if(!j.ok){$("loginHint").textContent=j.error||"登入失敗";btn.disabled=false;return;}
+      $("whoAmI").textContent=j.name+"（"+j.email+"）";
+      $("loginView").classList.add("hidden");$("mainView").classList.remove("hidden");
+      initApp();
+    })
+    .catch(function(){ $("loginHint").textContent="無法連線，請檢查網路";btn.disabled=false; });
+}
+$("btnLogin").addEventListener("click",login);
+$("loginPassword").addEventListener("keydown",function(e){if(e.key==="Enter")login();});
+$("btnLogout").addEventListener("click",function(){
+  api("/api/auth/logout",{method:"POST"}).catch(function(){}).finally(function(){location.reload();});
+});
+
+/* ---- 主程式 ---- */
+var currentTab="courses";
+var lists={};
+
+function initApp(){
+  var tabBar=$("tabs");tabBar.innerHTML="";
+  var keys=["courses","teachers","exhibitions","media","services","works","settings"];
+  var icons={courses:"📚 課程",teachers:"👩‍🎓 師資",exhibitions:"🏛 參展",media:"📰 媒體",services:"🛎 服務",works:"🖼 作品",settings:"📞 聯絡資訊"};
+  keys.forEach(function(k){
+    var b=document.createElement("button");
+    b.textContent=icons[k];b.dataset.tab=k;
+    if(k===currentTab)b.classList.add("active");
+    b.addEventListener("click",function(){switchTab(k);});
+    tabBar.appendChild(b);
+  });
+  switchTab("courses");
+}
+
+function switchTab(k){
+  currentTab=k;
+  document.querySelectorAll(".tabs button").forEach(function(b){b.classList.toggle("active",b.dataset.tab===k);});
+  document.querySelectorAll(".panel").forEach(function(p){p.classList.remove("active");});
+  var p=$("panel-"+k);
+  if(!p){p=document.createElement("div");p.id="panel-"+k;p.className="panel";$("panels").appendChild(p);}
+  p.classList.add("active");
+  if(k==="settings")renderSettings(p);else renderTable(k,p);
+}
+
+/* ---- 表格渲染 ---- */
+function renderTable(k,panel){
+  panel.innerHTML='<div class="panel-head"><h2>'+RESOURCES[k].label+'</h2><button onclick="openForm(\''+k+'\')">＋ 新增</button></div><div class="table-wrap"></div>';
+  var wrap=panel.querySelector(".table-wrap");
+  wrap.innerHTML='<p class="empty">載入中…</p>';
+  api("/api/"+k).then(function(rows){
+    lists[k]=rows;
+    if(!rows.length){wrap.innerHTML='<p class="empty">目前沒有資料，點右上「＋ 新增」建立第一筆</p>';return;}
+    var fields=RESOURCES[k].fields;
+    var html='<table><thead><tr><th>序</th>';
+    fields.forEach(function(f){
+      if(f.type==="image"){html+="<th>"+f.label.replace("圖片","圖")+"</th>";}
+      else if(f.name==="published"){html+="<th>顯示</th>";}
+      else if(f.name!=="description"&&f.name!=="bio"){html+="<th>"+f.label+"</th>";}
+    });
+    html+="<th style='width:150px'>操作</th></tr></thead><tbody>";
+    rows.forEach(function(r,i){
+      html+="<tr><td>"+(i+1)+"</td>";
+      fields.forEach(function(f){
+        var v=r[f.name];
+        if(f.type==="image"){
+          html+="<td>"+(v?'<img class="thumb" src="'+imgUrl(v)+'" alt="">':'<span style="color:#b0a48c">無</span>')+"</td>";
+        }
+        else if(f.name==="published"){html+="<td>"+(Number(v)?"✅":"—")+"</td>";}
+        else if(f.name!=="description"&&f.name!=="bio"){
+          var txt=String(v==null?"":v);
+          html+="<td title='"+esc(txt)+"' style='max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>"+esc(txt)+"</td>";
+        }
+      });
+      html+="<td><div class='rowbtns'>";
+      html+="<button class='up' onclick='moveRow(\""+k+"\","+i+",-1)' title='上移'>↑</button>";
+      html+="<button class='down' onclick='moveRow(\""+k+"\","+i+",1)' title='下移'>↓</button>";
+      html+="<button class='edit' onclick='openForm(\""+k+"\","+r.id+")'>編輯</button>";
+      html+="<button class='del' onclick='delRow(\""+k+"\","+r.id+")'>刪除</button>";
+      html+="</div></td></tr>";
+    });
+    html+="</tbody></table>";
+    wrap.innerHTML=html;
+  }).catch(function(e){wrap.innerHTML='<p class="empty">載入失敗：'+esc(e.message)+'</p>';});
+}
+
+/* ---- 排序調整（上移/下移 = 交換 sort_order） ---- */
+function moveRow(k,idx,dir){
+  var rows=lists[k];if(!rows)return;
+  var j=idx+dir;
+  if(j<0||j>=rows.length)return;
+  var a=rows[idx],b=rows[j];
+  var sa=Number(a.sort_order)||idx,bd=Number(b.sort_order)||j;
+  Promise.all([
+    api("/api/"+k+"/"+a.id,{method:"PUT",body:JSON.stringify({sort_order:bd})}),
+    api("/api/"+k+"/"+b.id,{method:"PUT",body:JSON.stringify({sort_order:sa})})
+  ]).then(function(){
+    var tmp=rows[idx];rows[idx]=rows[j];rows[j]=tmp;
+    switchTab(k);
+  }).catch(function(e){showMsg(e.message,false);});
+}
+
+/* ---- 刪除 ---- */
+function delRow(k,id){
+  if(!confirm("確定要刪除這筆資料嗎？刪除後無法復原。"))return;
+  api("/api/"+k+"/"+id,{method:"DELETE"})
+    .then(function(){showMsg("已刪除",true);switchTab(k);})
+    .catch(function(e){showMsg(e.message,false);});
+}
+
+/* ---- 新增/編輯表單 ---- */
+var editingId=null;
+var editingKey=null;
+
+function openForm(k,id){
+  editingKey=k;editingId=id==null?null:id;
+  var row=null;
+  if(id!=null){var rows=lists[k]||[];rows.forEach(function(r){if(String(r.id)===String(id))row=r;});}
+  $("modalTitle").textContent=row?("編輯 · "+RESOURCES[k].label):("新增 · "+RESOURCES[k].label);
+  var html="";
+  RESOURCES[k].fields.forEach(function(f){
+    var v=row?row[f.name]:null;
+    var val=v==null?"":v;
+    if(f.type==="image"){
+      html+='<label>'+f.label+(f.required?' *':'')+'</label>';
+      html+='<input type="file" accept="image/*" data-field="'+f.name+'">';
+      html+='<input type="hidden" data-field="'+f.name+'" value="'+esc(val)+'">';
+      html+='<div class="preview" data-preview="'+f.name+'">'+(val?'<img src="'+imgUrl(val)+'">':'')+'</div>';
+      html+='<div class="img-note">超過 400KB 會自動壓縮；選新圖後將於儲存時上傳</div>';
+    }
+    else if(f.type==="textarea"){
+      html+='<label>'+f.label+(f.required?' *':'')+'</label><textarea data-field="'+f.name+'">'+esc(val)+'</textarea>';
+    }
+    else if(f.type==="check"){
+      html+='<label class="check"><input type="checkbox" data-field="'+f.name+'" '+(Number(val)||(f.def&&v==null)?"checked":"")+'> '+f.label+'</label>';
+    }
+    else if(f.type==="number"){
+      html+='<label>'+f.label+'</label><input type="number" data-field="'+f.name+'" value="'+esc(val)+'">';
+    }
+    else{
+      html+='<label>'+f.label+(f.required?' *':'')+'</label><input type="text" data-field="'+f.name+'" value="'+esc(val)+'" '+(f.type==="url"?'inputmode="url"':'')+'>';
+    }
+  });
+  $("modalForm").innerHTML=html;
+  $("modalBg").classList.remove("hidden");
+
+  /* 圖片預覽 */
+  $("modalForm").querySelectorAll("input[type=file]").forEach(function(fi){
+    fi.addEventListener("change",function(){
+      var f=fi.files&&fi.files[0];if(!f)return;
+      var p=$("modalForm").querySelector('[data-preview="'+fi.dataset.field+'"]');
+      p.style.display="block";
+      p.innerHTML='<img src="'+URL.createObjectURL(f)+'"><div class="img-note">'+(f.size/1024>400?"將自動壓縮":"")+'</div>';
+    });
+  });
+}
+
+function closeForm(){$("modalBg").classList.add("hidden");$("modalForm").innerHTML="";editingId=null;editingKey=null;}
+$("btnCancel").addEventListener("click",closeForm);
+$("modalBg").addEventListener("click",function(e){if(e.target===this)closeForm();});
+
+$("btnSave").addEventListener("click",function(){
+  var btn=$("btnSave");btn.disabled=true;
+  var data={};
+  var filesToUpload=[];
+  $("modalForm").querySelectorAll("[data-field]").forEach(function(el){
+    var f=el.dataset.field;
+    if(el.type==="file"){
+      if(el.files&&el.files.length)f.filesToUpload=filesToUpload.push({field:f,file:el.files[0]});
+    }
+    else if(el.type==="checkbox"){data[f]=el.checked?1:0;}
+    else{data[f]=el.value;}
+  });
+  var ok=RESOURCES[editingKey].fields.every(function(fd){
+    if(fd.required){
+      var hasFile=filesToUpload.some(function(u){return u.field===fd.name;});
+      var hasValue=fd.type==="image"?(data[fd.name]!=null&&data[fd.name]!==""):(data[fd.name]!=null&&data[fd.name]!=="");
+      if(!hasFile&&!hasValue){
+        showMsg("請填寫必填欄位："+fd.label,false);btn.disabled=false;return false;
+      }
+    }
+    return true;
+  });
+  if(!ok)return;
+
+  var doUpload=function(cb){
+    var next=0;
+    (function up(){
+      if(next>=filesToUpload.length){cb();return;}
+      var it=filesToUpload[next++];
+      compressImage(it.file).then(function(out){
+        fetch(API_BASE+"/api/upload",{method:"POST",credentials:"include",headers:{"X-File-Name":encodeURIComponent(out.name)},body:out})
+          .then(function(r){return r.json();})
+          .then(function(j){
+            if(!j.ok)throw new Error(j.error||"圖片上傳失敗");
+            data[it.field]=j.url;
+            up();
+          })
+          .catch(function(e){showMsg(e.message,false);btn.disabled=false;});
+      });
+    })();
+  };
+
+  doUpload(function(){
+    var path="/api/"+editingKey+(editingId?"/"+editingId:"");
+    var method=editingId?"PUT":"POST";
+    api(path,{method:method,body:JSON.stringify(data)})
+      .then(function(){showMsg("已儲存",true);var k=editingKey;closeForm();switchTab(k);})
+      .catch(function(e){showMsg(e.message,false);btn.disabled=false;});
+  });
+});
+
+/* ---- 聯絡資訊 ---- */
+function renderSettings(panel){
+  panel.innerHTML='<div class="panel-head"><h2>聯絡資訊</h2><button onclick="loadSettings()">重新整理</button></div><div class="settings-form"></div>';
+  loadSettings();
+}
+function loadSettings(){
+  var panel=$("panel-settings");if(!panel)return;
+  var wrap=panel.querySelector(".settings-form");
+  wrap.innerHTML='<p class="empty">載入中…</p>';
+  api("/api/settings").then(function(s){
+    var html="";
+    SETTING_FIELDS.forEach(function(f){
+      html+='<label style="display:block;font-size:13px;font-weight:bold;color:var(--text-soft);margin:12px 0 4px">'+f.label+'</label>';
+      html+='<input type="text" data-setting="'+f.key+'" value="'+esc(s[f.key]||"")+'" style="width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:14px">';
+    });
+    html+='<button onclick="saveSettings()" style="margin-top:20px;padding:11px 30px;background:var(--primary);color:#fff;border:0;border-radius:8px;font-size:15px;font-weight:bold;cursor:pointer">儲存聯絡資訊</button>';
+    wrap.innerHTML=html;
+  }).catch(function(e){wrap.innerHTML='<p class="empty">載入失敗：'+esc(e.message)+'</p>';});
+}
+function saveSettings(){
+  var data={};
+  document.querySelectorAll("#panel-settings [data-setting]").forEach(function(el){data[el.dataset.setting]=el.value;});
+  api("/api/settings",{method:"PUT",body:JSON.stringify(data)})
+    .then(function(){showMsg("聯絡資訊已更新",true);})
+    .catch(function(e){showMsg(e.message,false);});
+}
+
+/* 表單送出時按 Enter 不要刷新頁面 */
+document.addEventListener("keydown",function(e){
+  if(e.key==="Escape")closeForm();
+});
+
+/* 啟動：先檢查是否已登入 */
+api("/api/auth/me").then(function(j){
+  $("whoAmI").textContent=j.name+"（"+j.email+"）";
+  $("loginView").classList.add("hidden");$("mainView").classList.remove("hidden");
+  initApp();
+}).catch(function(){});
+</script>
+</body>
+</html>

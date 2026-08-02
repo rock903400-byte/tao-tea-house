@@ -1,0 +1,16 @@
+# 陶茶雅舍後台 — Cloudflare Worker + D1 + KV 設定
+# 部署：wrangler deploy
+# 本地測試：wrangler dev
+
+name = "tao-tea-house-api"
+main = "src/worker.js"
+compatibility_date = "2026-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tao-tea-house-db"
+database_id = "1a8e5d22-47de-4377-97f8-968e3c267d7f"
+
+[[kv_namespaces]]
+binding = "CONTENT"
+id = "8adf8eeb4c3d48a5876abae13d4d5f99"
