@@ -59,7 +59,35 @@ td .icon-txt{font-size:26px}
 .rowbtns .down{border-color:#EF9A9A;color:var(--danger)}
 .rowbtns .edit{color:var(--primary);border-color:#B0C4BC}
 .rowbtns .del{color:var(--danger);border-color:#EF9A9A}
+td .link-btn{display:inline-block;padding:4px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--primary);background:#fff;text-decoration:none;white-space:nowrap}
+td .link-btn:hover{background:#efe9dc}
 .empty{color:var(--text-soft);font-size:14px;padding:20px;text-align:center;background:var(--surface);border:1px dashed var(--border);border-radius:10px}
+
+/* ---- 列表容器（配合 table 橫向捲動） ---- */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.table-wrap table{min-width:560px}
+
+/* ---- 手機：表格轉卡片 ---- */
+@media(max-width:640px){
+  #mainView{padding:14px 10px 50px}
+  .topbar{flex-wrap:wrap}
+  .topbar .who{width:100%;order:3}
+  .table-wrap{overflow:visible}
+  .table-wrap table,.table-wrap thead,.table-wrap tbody,.table-wrap tr{display:block;width:100%}
+  .table-wrap thead{display:none}
+  .table-wrap tr{display:flex;flex-wrap:wrap;gap:8px 12px;padding:12px;border-bottom:1px solid #F0EADA;align-items:center}
+  .table-wrap td{border:0;padding:0;font-size:14px}
+  .table-wrap td::before{content:attr(data-label);display:block;font-size:11px;color:var(--text-soft);font-weight:bold;margin-bottom:2px}
+  .table-wrap td[data-cell=no]{width:28px}
+  .table-wrap td[data-cell=no]::before{display:none}
+  .table-wrap td[data-cell=thumb]{order:-1;margin-right:auto}
+  .table-wrap td[data-cell=thumb]::before{display:none}
+  .table-wrap td[data-cell=actions]{width:100%;display:flex;justify-content:flex-end;margin-top:6px}
+  .table-wrap td[data-cell=actions]::before{display:none}
+  .table-wrap td[data-cell=link]{width:auto}
+  .table-wrap td[data-cell=link]::before{display:none}
+  .rowbtns{justify-content:flex-end}
+}
 
 /* ---- 表單 ---- */
 .modal-bg{position:fixed;inset:0;background:rgba(26,46,38,.55);display:flex;align-items:flex-start;justify-content:center;padding:30px 16px;z-index:50;overflow:auto}
@@ -153,7 +181,7 @@ var API_BASE = "https://tao-tea-house-api.rock903400.workers.dev"; /* 部署後�
 
 /* ---- 資源定義（欄位 → 表單） ---- */
 var RESOURCES = {
-  courses: { label: "課程", fields: [
+  courses: { label: "課程", list: ["title", "tag", "date", "fee", "published"], fields: [
     { name: "title", label: "課程名稱", type: "text", required: true },
     { name: "tag", label: "標籤（如：茶藝入門體驗）", type: "text" },
     { name: "subtitle", label: "副標題", type: "text" },
@@ -169,32 +197,32 @@ var RESOURCES = {
     { name: "published", label: "在網站上顯示", type: "check", def: 1 },
     { name: "sort_order", label: "排序（數字越小越前面）", type: "number" }
   ]},
-  teachers: { label: "師資", fields: [
+  teachers: { label: "師資", list: ["image", "name", "title"], fields: [
     { name: "name", label: "姓名", type: "text", required: true },
     { name: "title", label: "頭銜（如：壺藝達人｜創辦人）", type: "text" },
     { name: "bio", label: "介紹", type: "textarea" },
     { name: "image", label: "照片", type: "image" },
     { name: "sort_order", label: "排序", type: "number" }
   ]},
-  exhibitions: { label: "參展經歷", fields: [
+  exhibitions: { label: "參展經歷", list: ["year", "title"], fields: [
     { name: "year", label: "年度（如：114 年）", type: "text", required: true },
     { name: "title", label: "展覽名稱", type: "text", required: true },
     { name: "sort_order", label: "排序", type: "number" }
   ]},
-  media: { label: "媒體報導", fields: [
+  media: { label: "媒體報導", list: ["type", "title", "link"], fields: [
     { name: "type", label: "類型（如：新聞專訪）", type: "text" },
     { name: "title", label: "標題", type: "text", required: true },
     { name: "description", label: "摘要", type: "textarea" },
     { name: "link", label: "連結網址", type: "url" },
     { name: "sort_order", label: "排序", type: "number" }
   ]},
-  services: { label: "服務項目", fields: [
+  services: { label: "服務項目", list: ["icon", "name"], fields: [
     { name: "icon", label: "圖示（emoji，如：🏺）", type: "text" },
     { name: "name", label: "名稱", type: "text", required: true },
     { name: "description", label: "說明", type: "textarea" },
     { name: "sort_order", label: "排序", type: "number" }
   ]},
-  works: { label: "作品展示", fields: [
+  works: { label: "作品展示", list: ["image", "caption"], fields: [
     { name: "image", label: "作品圖片", type: "image", required: true },
     { name: "caption", label: "說明文字", type: "text" },
     { name: "sort_order", label: "排序", type: "number" }
@@ -333,30 +361,40 @@ function renderTable(k,panel){
   api("/api/"+k).then(function(rows){
     lists[k]=rows;
     if(!rows.length){wrap.innerHTML='<p class="empty">目前沒有資料，點右上「＋ 新增」建立第一筆</p>';return;}
-    var fields=RESOURCES[k].fields;
-    var html='<table><thead><tr><th>序</th>';
-    fields.forEach(function(f){
-      if(f.type==="image"){html+="<th>"+f.label.replace("圖片","圖")+"</th>";}
-      else if(f.name==="published"){html+="<th>顯示</th>";}
-      else if(f.name!=="description"&&f.name!=="bio"){html+="<th>"+f.label+"</th>";}
+    var def=RESOURCES[k];
+    var fields=def.fields;
+    var listCols=(def.list||fields.map(function(f){return f.name;})).filter(function(n){return n!=="sort_order"&&n!=="description"&&n!=="bio";});
+    var headers=listCols.map(function(n){
+      if(n==="image")return "圖";
+      var f=null;fields.forEach(function(x){if(x.name===n)f=x;});
+      return f?(f.label.replace(/（.*$/,"")):n;
     });
-    html+="<th style='width:150px'>操作</th></tr></thead><tbody>";
-    rows.forEach(function(r,i){
-      html+="<tr><td>"+(i+1)+"</td>";
-      fields.forEach(function(f){
-        var v=r[f.name];
-        if(f.type==="image"){
-          html+="<td>"+(v?'<img class="thumb" src="'+imgUrl(v)+'" alt="">':'<span style="color:#b0a48c">無</span>')+"</td>";
+    var html='<table><thead><tr><th>序</th>';
+    headers.forEach(function(h){html+="<th>"+h+"</th>";});
+    html+="<th>操作</th></tr></thead><tbody>";
+    rows.forEach(function(r,ri){
+      html+="<tr><td data-cell='no'>"+(ri+1)+"</td>";
+      listCols.forEach(function(n){
+        var f=null;fields.forEach(function(x){if(x.name===n)f=x;});
+        var v=r[n];
+        if(f&&f.type==="image"){
+          html+="<td data-cell='thumb'>"+(v?'<img class="thumb" src="'+imgUrl(v)+'" alt="">':'<span style="color:#b0a48c">無</span>')+"</td>";
         }
-        else if(f.name==="published"){html+="<td>"+(Number(v)?"✅":"—")+"</td>";}
-        else if(f.name!=="description"&&f.name!=="bio"){
+        else if(n==="published"){
+          html+="<td data-label='顯示'>"+(Number(v)?"✅":"—")+"</td>";
+        }
+        else if(f&&f.type==="url"&&v){
+          html+="<td data-cell='link'><a class='link-btn' href='"+esc(v)+"' target='_blank' rel='noopener'>開啟 ↗</a></td>";
+        }
+        else{
           var txt=String(v==null?"":v);
-          html+="<td title='"+esc(txt)+"' style='max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>"+esc(txt)+"</td>";
+          var lb=(f?(f.label.replace(/（.*/,"")):n);
+          html+="<td data-label='"+esc(lb)+"' title='"+esc(txt)+"' style='max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>"+esc(txt)+"</td>";
         }
       });
-      html+="<td><div class='rowbtns'>";
-      html+="<button class='up' onclick='moveRow(\""+k+"\","+i+",-1)' title='上移'>↑</button>";
-      html+="<button class='down' onclick='moveRow(\""+k+"\","+i+",1)' title='下移'>↓</button>";
+      html+="<td data-cell='actions'><div class='rowbtns'>";
+      html+="<button class='up' onclick='moveRow(\""+k+"\","+ri+",-1)' title='上移'>↑</button>";
+      html+="<button class='down' onclick='moveRow(\""+k+"\","+ri+",1)' title='下移'>↓</button>";
       html+="<button class='edit' onclick='openForm(\""+k+"\","+r.id+")'>編輯</button>";
       html+="<button class='del' onclick='delRow(\""+k+"\","+r.id+")'>刪除</button>";
       html+="</div></td></tr>";
@@ -533,7 +571,7 @@ api("/api/auth/me").then(function(j){
   $("whoAmI").textContent=j.name+"（"+j.email+"）";
   $("loginView").classList.add("hidden");$("mainView").classList.remove("hidden");
   initApp();
-}).catch(function(){});
+}).catch(function(){ $("loginHint").textContent="登入已過期或尚未登入，請重新登入"; });
 </script>
 </body>
 </html>
