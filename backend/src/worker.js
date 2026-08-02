@@ -243,6 +243,46 @@ async function handleMe(request, env) {
   return json({ ok: true, name: admin.name, email: admin.email });
 }
 
+async function handleChangePassword(request, env) {
+  const admin = await verifySession(env, request);
+  if (!admin) return json({ ok: false, error: "請先登入" }, 401);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ ok: false, error: "無法解析請求內容" }, 400);
+  }
+  const current = body.current || "";
+  const next = body.next || "";
+  if (!current || next.length < 8) {
+    return json({ ok: false, error: "新密碼需至少 8 個字元" }, 400);
+  }
+
+  const row = await env.DB.prepare("SELECT salt, password_hash FROM admins WHERE id = ?")
+    .bind(admin.admin_id)
+    .first();
+  if (!row) return json({ ok: false, error: "帳號不存在" }, 404);
+
+  const currentHash = await hashPassword(current, row.salt);
+  if (currentHash !== row.password_hash) {
+    return json({ ok: false, error: "目前的密碼不正確" }, 401);
+  }
+
+  const saltHex = newSalt();
+  const nextHash = await hashPassword(next, saltHex);
+  await env.DB.prepare("UPDATE admins SET salt = ?, password_hash = ? WHERE id = ?")
+    .bind(saltHex, nextHash, admin.admin_id)
+    .run();
+
+  /* 其他登入中的 session 全部作廢，保留目前這個 */
+  await env.DB.prepare("DELETE FROM sessions WHERE admin_id = ? AND token != ?")
+    .bind(admin.admin_id, getCookie(request, COOKIE_NAME))
+    .run();
+
+  return json({ ok: true, message: "密碼已更新" });
+}
+
 /* ---------------- 公開資料 ---------------- */
 
 async function handlePublicData(env) {
@@ -454,6 +494,11 @@ async function handleRequest(request, env, ctx) {
     }
     if (pathname === "/api/auth/me") {
       return withCors(await handleMe(request, env));
+    }
+
+    /* 變更密碼（需要登入） */
+    if (pathname === "/api/auth/change-password" && request.method === "POST") {
+      return withCors(await handleChangePassword(request, env));
     }
 
     /* 以下全部需要登入 */

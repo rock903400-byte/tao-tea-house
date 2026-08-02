@@ -104,6 +104,7 @@ td .icon-txt{font-size:26px}
     <h1>陶茶雅舍 · 管理後台</h1>
     <div style="display:flex;gap:10px;align-items:center">
       <span class="who" id="whoAmI"></span>
+      <button id="btnChangePwd">變更密碼</button>
       <button id="btnLogout">登出</button>
     </div>
   </div>
@@ -121,6 +122,23 @@ td .icon-txt{font-size:26px}
     <div class="modal-btns">
       <button class="save" id="btnSave">儲存</button>
       <button class="cancel" id="btnCancel">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======== 變更密碼 Modal ======== -->
+<div class="modal-bg hidden" id="pwdModalBg">
+  <div class="modal">
+    <h3>變更密碼</h3>
+    <label>目前的密碼</label>
+    <input type="password" id="pwdCurrent" autocomplete="current-password" placeholder="請輸入目前密碼">
+    <label>新密碼（至少 8 個字元）</label>
+    <input type="password" id="pwdNext" autocomplete="new-password" placeholder="請輸入新密碼">
+    <label>再次輸入新密碼</label>
+    <input type="password" id="pwdConfirm" autocomplete="new-password" placeholder="再輸入一次新密碼">
+    <div class="modal-btns">
+      <button class="save" id="btnPwdSave">儲存新密碼</button>
+      <button class="cancel" id="btnPwdCancel">取消</button>
     </div>
   </div>
 </div>
@@ -257,6 +275,26 @@ $("btnLogin").addEventListener("click",login);
 $("loginPassword").addEventListener("keydown",function(e){if(e.key==="Enter")login();});
 $("btnLogout").addEventListener("click",function(){
   api("/api/auth/logout",{method:"POST"}).catch(function(){}).finally(function(){location.reload();});
+});
+
+/* ---- 變更密碼 ---- */
+$("btnChangePwd").addEventListener("click",function(){
+  $("pwdCurrent").value="";$("pwdNext").value="";$("pwdConfirm").value="";
+  $("pwdModalBg").classList.remove("hidden");
+  $("pwdCurrent").focus();
+});
+$("btnPwdCancel").addEventListener("click",function(){$("pwdModalBg").classList.add("hidden");});
+$("pwdModalBg").addEventListener("click",function(e){if(e.target===this)$("pwdModalBg").classList.add("hidden");});
+$("btnPwdSave").addEventListener("click",function(){
+  var cur=$("pwdCurrent").value,nxt=$("pwdNext").value,cfm=$("pwdConfirm").value;
+  if(!cur||!nxt){showMsg("請輸入目前的密碼與新密碼",false);return;}
+  if(nxt.length<8){showMsg("新密碼需至少 8 個字元",false);return;}
+  if(nxt!==cfm){showMsg("兩次輸入的新密碼不一致",false);return;}
+  var btn=$("btnPwdSave");btn.disabled=true;
+  api("/api/auth/change-password",{method:"POST",body:JSON.stringify({current:cur,next:nxt})})
+    .then(function(){showMsg("密碼已更新",true);$("pwdModalBg").classList.add("hidden");})
+    .catch(function(e){showMsg(e.message,false);})
+    .finally(function(){btn.disabled=false;});
 });
 
 /* ---- 主程式 ---- */
@@ -483,7 +521,7 @@ function saveSettings(){
 
 /* 表單送出時按 Enter 不要刷新頁面 */
 document.addEventListener("keydown",function(e){
-  if(e.key==="Escape")closeForm();
+  if(e.key==="Escape"){closeForm();$("pwdModalBg").classList.add("hidden");}
 });
 
 /* 啟動：先檢查是否已登入 */
