@@ -165,7 +165,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 .navbar__menu a:hover { color: var(--color-primary); }
 .navbar__menu a:hover::after { width: 100%; }
-.navbar__cta {
+.navbar__menu a.navbar__cta {
   background: var(--color-primary);
   color: var(--color-secondary);
   padding: 10px 22px;
@@ -173,8 +173,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   font-size: 0.9rem;
   font-weight: 500;
 }
-.navbar__cta::after { display: none !important; }
-.navbar__cta:hover {
+.navbar__menu a.navbar__cta::after { display: none !important; }
+.navbar__menu a.navbar__cta:hover {
   background: var(--color-primary-dark);
   color: var(--color-accent);
 }
