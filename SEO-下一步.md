@@ -163,7 +163,11 @@ Google 商家檔案上的評論越多、評分越高，別人在搜尋「台南 
 
 以下項目已在程式碼中完成，推上 GitHub 後自動生效：
 
-- ✅ Schema.org 結構化資料（LocalBusiness + 4 項 Service）
+- ✅ Schema.org 結構化資料（LocalBusiness + 4 項 Service + Course）
+- ✅ FAQPage 結構化資料（6 題常見問題，利於 Google 精選摘要與 AI 引用）
+- ✅ LocalBusiness `hasOfferCatalog`（4 項服務目錄）
+- ✅ Course schema 含日期、地點、名額上限（利於 Google 課程資訊）
+- ✅ BreadcrumbList 結構化資料（course-tea.html）
 - ✅ Open Graph 社群分享（含圖片尺寸）
 - ✅ Twitter Card
 - ✅ 在地 SEO geo 標籤（新營區經緯度）
@@ -174,6 +178,16 @@ Google 商家檔案上的評論越多、評分越高，別人在搜尋「台南 
 - ✅ 效能優化（dns-prefetch、theme-color）
 - ✅ 移除過時 meta keywords
 - ✅ Course schema provider 升級為 LocalBusiness
+
+## AI 搜尋優化（已完成）
+
+- ✅ `llms.txt`（AI 精簡版，含服務、課程、聯絡、師資）
+- ✅ `llms-full.txt`（AI 全文版，含 FAQ、22 筆參展經歷、媒體報導、公益活動）
+- ✅ `robots.txt` 顯式放行 AI 爬蟲：GPTBot、OAI-SearchBot、ChatGPT-User、ClaudeBot、anthropic-ai、PerplexityBot、Google-Extended、GoogleOther、Bingbot、CCBot、Bytespider、cohere-ai、meta-externalagent、Applebot-Extended、Applebot、Amazonbot
+- ✅ FAQPage Schema（AI 問答直接引用）
+- ✅ sitemap.xml 已列出所有頁面與圖片
+
+> AI 搜尋（ChatGPT、Perplexity、Gemini 等）透過 `llms.txt`、`llms-full.txt`、robots.txt 與 FAQ Schema 四管齊下。內容越完整、更新越頻繁，AI 引用機會越高。**每次課程/活動有更新時，請同步更新 `llms.txt` 與 `llms-full.txt`**。
 
 ---
 
@@ -192,4 +206,4 @@ Google 商家檔案上的評論越多、評分越高，別人在搜尋「台南 
 
 ---
 
-最後更新：2026-07-19
+最後更新：2026-08-02

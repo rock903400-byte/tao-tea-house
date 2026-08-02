@@ -1,26 +1,71 @@
 User-agent: *
 Allow: /
 
-# 顯式允許 AI 搜尋引擎與聊天機器人爬蟲
+# ===== AI 搜尋引擎與聊天機器人爬蟲（顯式放行）=====
+
+# OpenAI（GPTBot 抓取訓練資料）
 User-agent: GPTBot
 Allow: /
 
+# OpenAI 搜尋（ChatGPT 搜尋結果引用）
+User-agent: OAI-SearchBot
+Allow: /
+
+# OpenAI ChatGPT（使用者主動分享連結時抓取）
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic（Claude）
 User-agent: ClaudeBot
 Allow: /
 
+# Anthropic（Claude 舊版）
+User-agent: anthropic-ai
+Allow: /
+
+# Perplexity
 User-agent: PerplexityBot
 Allow: /
 
+# Google（Gemini / AI Overviews 訓練）
 User-agent: Google-Extended
 Allow: /
 
+# Google 其他服務
+User-agent: GoogleOther
+Allow: /
+
+# Microsoft（Bing AI / Copilot）
 User-agent: Bingbot
 Allow: /
 
+# Common Crawl（大型語言模型訓練資料來源）
 User-agent: CCBot
 Allow: /
 
+# ByteDance（豆包 / 抖音）
 User-agent: Bytespider
 Allow: /
 
+# Cohere
+User-agent: cohere-ai
+Allow: /
+
+# Meta AI（Llama）
+User-agent: meta-externalagent
+Allow: /
+
+# Apple Intelligence
+User-agent: Applebot-Extended
+Allow: /
+
+# Apple 一般爬蟲
+User-agent: Applebot
+Allow: /
+
+# Amazon（Alexa / Rufus）
+User-agent: Amazonbot
+Allow: /
+
+# 讓所有爬蟲都能讀取 AI 全文版
 Sitemap: https://rock903400-byte.github.io/tao-tea-house/sitemap.xml
