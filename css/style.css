@@ -1066,6 +1066,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   justify-content: center;
   padding: 20px;
 }
+.signup-modal-bg[hidden] { display: none; }
 .signup-modal {
   background: var(--color-secondary);
   border-radius: var(--radius);
