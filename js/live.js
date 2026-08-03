@@ -83,7 +83,11 @@
       (meta ? '<dl class="course-card__meta">' + meta + "</dl>" : "") +
       '<div style="display:flex;gap:12px;flex-wrap:wrap;">' +
       signup +
-      '<a href="course-tea.html" class="btn btn--ghost" style="color:var(--color-primary);border-color:var(--color-primary);">查看詳情 →</a>' +
+      (course.detail_url
+        ? '<a href="' +
+          esc(course.detail_url) +
+          '" class="btn btn--ghost" style="color:var(--color-primary);border-color:var(--color-primary);">查看詳情 →</a>'
+        : "") +
       "</div></div></article>"
     );
   }
@@ -214,7 +218,23 @@
     if (floatFb && s.facebook) floatFb.href = s.facebook;
   }
 
-  /* ---------- 課程詳情頁（course-tea.html） ---------- */
+  /* ---------- 課程詳情頁（course-tea.html / course-pottery.html） ---------- */
+  /* 依目前頁面檔名比對課程 detail_url，找不到則回傳 null（保留靜態內容） */
+  function matchCourse(courses) {
+    var path =
+      String(location.pathname || "")
+        .split("/")
+        .pop() || "";
+    if (path.indexOf("course-") !== 0) return null;
+    for (var i = 0; i < courses.length; i++) {
+      var url = String(courses[i].detail_url || "")
+        .split("/")
+        .pop();
+      if (url && url === path) return courses[i];
+    }
+    return null;
+  }
+
   function renderCoursePage(course) {
     if (!course || !document.querySelector(".signup-card")) return;
 
@@ -272,23 +292,10 @@
     /* 報名按鈕 */
     if (course.signup_url) {
       document
-        .querySelectorAll(".signup-card a.btn--primary, .section--dark a.btn--primary, .sticky-cta")
+        .querySelectorAll(".signup-card a.btn--primary, .section--dark a.btn--primary")
         .forEach(function (a) {
           a.href = course.signup_url;
         });
-    }
-
-    /* 詢問電話 */
-    if (course.date) {
-      var cta = document.querySelector(".sticky-cta");
-      if (cta && course.fee) {
-        cta.innerHTML =
-          "立即報名 " +
-          esc(course.title) +
-          " <span>" +
-          String(course.fee).replace(" / 人", "") +
-          "</span> →";
-      }
     }
   }
 
@@ -349,9 +356,9 @@
     /* 聯絡資訊 */
     if (data.settings) renderContact(data.settings);
 
-    /* 課程詳情頁（若存在對應元素） */
+    /* 課程詳情頁（依目前頁面比對 detail_url） */
     if (data.courses && data.courses.length) {
-      renderCoursePage(data.courses[0]);
+      renderCoursePage(matchCourse(data.courses));
     }
 
     /* 重新初始化 lightbox（動態產生的作品） */

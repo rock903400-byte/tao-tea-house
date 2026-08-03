@@ -31,6 +31,7 @@ const RESOURCES = {
       "bonus",
       "location",
       "signup_url",
+      "detail_url",
       "image",
       "published",
       "sort_order",

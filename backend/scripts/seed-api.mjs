@@ -22,9 +22,28 @@ const seed = {
       bonus: "報名即送 茶葉一包",
       location: "台南市新營區三民路92-2號 2樓（辻間創生聚落 B3棟 2樓）",
       signup_url: "https://forms.gle/DMLU44EgRqDFtvAA9",
+      detail_url: "course-tea.html",
       image: "assets/class-tea.jpg",
       published: 1,
       sort_order: 0,
+    },
+    {
+      title: "緞泥手捏陶藝課",
+      tag: "陶藝入門",
+      subtitle: "由淺入深完整教學",
+      description:
+        "12 堂完整課程，從練土、塑形到燒窯，由田清標老師親授手捏陶藝，讓每一次手捏都成為獨一無二的作品。",
+      date: "2026-08-30（日）起，每週日共 12 堂",
+      time: "每堂 4 小時",
+      fee: "$8,000 / 人",
+      capacity: "小班教學",
+      bonus: "含陶土與燒窯費用",
+      location: "台南市新營區三民路92-2號 2樓（辻間創生聚落 B3棟 2樓）",
+      signup_url: "",
+      detail_url: "course-pottery.html",
+      image: "assets/pottery-set.jpg",
+      published: 1,
+      sort_order: 1,
     },
   ],
   teachers: [
@@ -162,9 +181,23 @@ async function main() {
 
   for (const [res, items] of Object.entries(seed)) {
     if (res === "settings") continue;
+
+    /* 抓取現有資料（依 title 比對，避免重複匯入） */
+    let existing = [];
+    const existingRes = await fetch(API + "/api/" + res, { headers: { Cookie: cookie } });
+    if (existingRes.ok) {
+      const j = await existingRes.json();
+      if (Array.isArray(j)) existing = j;
+    }
+
     for (const item of items) {
-      const r = await fetch(API + "/api/" + res, {
-        method: "POST",
+      const key = item.title || item.name || item.year || item.image || "";
+      const found = existing.find(
+        (x) => String(x.title || x.name || x.year || x.image || "") === String(key)
+      );
+      const url = found ? API + "/api/" + res + "/" + found.id : API + "/api/" + res;
+      const r = await fetch(url, {
+        method: found ? "PUT" : "POST",
         headers,
         body: JSON.stringify(item),
       });
@@ -173,7 +206,7 @@ async function main() {
         console.error("匯入失敗", res, JSON.stringify(item), j);
         process.exit(1);
       }
-      console.log("✓", res, "-", item.title || item.name || item.image || item.year);
+      console.log(found ? "⇅ 更新" : "✓ 新增", res, "-", key);
     }
   }
 
