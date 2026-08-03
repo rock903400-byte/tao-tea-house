@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS courses (
   bonus TEXT DEFAULT '',
   location TEXT DEFAULT '',
   signup_url TEXT DEFAULT '',
+  detail_url TEXT DEFAULT '',
   image TEXT DEFAULT '',
   published INTEGER NOT NULL DEFAULT 1,
   sort_order INTEGER NOT NULL DEFAULT 0,
