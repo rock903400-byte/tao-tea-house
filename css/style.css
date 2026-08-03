@@ -537,7 +537,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .course-card__image {
   background: var(--color-primary);
   position: relative;
-  min-height: 380px;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
 }
 .course-card__image img {
@@ -641,6 +641,76 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   transition: opacity var(--transition);
 }
 .gallery__item:hover::after { opacity: 1; }
+
+/* 推薦 Banner */
+.photo-banner {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  margin: 48px 0 0;
+  color: var(--color-secondary);
+  min-height: 360px;
+  display: flex;
+  align-items: center;
+}
+.photo-banner__bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('../assets/pottery-set.jpg');
+  background-image: image-set(
+    url('../assets/pottery-set-sm.webp') type('image/webp') 1x,
+    url('../assets/pottery-set.webp') type('image/webp') 2x,
+    url('../assets/pottery-set.jpg') type('image/jpeg') 2x
+  );
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.5);
+  z-index: 0;
+}
+.photo-banner__content {
+  position: relative;
+  z-index: 1;
+  padding: 56px 48px;
+  max-width: 620px;
+}
+.photo-banner__tag {
+  display: inline-block;
+  background: var(--color-accent);
+  color: var(--color-primary-dark);
+  padding: 6px 18px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-bottom: 18px;
+}
+.photo-banner__title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1.35;
+  margin-bottom: 16px;
+}
+.photo-banner__desc {
+  color: rgba(245, 240, 230, 0.9);
+  margin-bottom: 28px;
+  line-height: 1.8;
+}
+.photo-banner__actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.photo-banner .btn--ghost {
+  color: var(--color-secondary);
+  border-color: var(--color-secondary);
+}
+.photo-banner .btn--ghost:hover {
+  background: var(--color-secondary);
+  color: var(--color-primary);
+}
 
 /* Lightbox */
 .lightbox {
@@ -1055,6 +1125,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   gap: 16px;
   margin-top: 48px;
 }
+.real-grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
 .real-item {
   position: relative;
   aspect-ratio: 3 / 4;
@@ -1062,6 +1135,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   border-radius: var(--radius);
   box-shadow: var(--shadow-md);
   background: var(--color-primary);
+}
+.real-item--wide {
+  aspect-ratio: 16 / 9;
 }
 .real-item img {
   width: 100%; height: 100%;
@@ -1112,6 +1188,17 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   opacity: 0.15;
 }
 .page-hero__content { position: relative; z-index: 1; }
+.page-hero--pottery::before {
+  background: url('../assets/pottery-set.jpg') center/cover;
+  background-image: image-set(
+    url('../assets/pottery-set-sm.webp') type('image/webp') 1x,
+    url('../assets/pottery-set.webp') type('image/webp') 2x,
+    url('../assets/pottery-set-sm.jpg') type('image/jpeg') 1x,
+    url('../assets/pottery-set.jpg') type('image/jpeg') 2x
+  );
+  background-position: center;
+  background-size: cover;
+}
 .page-hero h1 {
   font-family: var(--font-heading);
   font-size: clamp(2.2rem, 5vw, 3.5rem);
@@ -1140,6 +1227,41 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 .signup-content h2:first-child { margin-top: 0; }
 .signup-content p { margin-bottom: 16px; color: var(--color-text-soft); }
+
+.figure-text {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 28px;
+  align-items: center;
+  background: var(--color-white);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  margin: 36px 0 12px;
+}
+.figure-text img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.figure-text__body { padding: 32px 30px; }
+.figure-text__body h3 {
+  font-family: var(--font-heading);
+  color: var(--color-primary);
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+}
+.figure-text__body p { color: var(--color-text-soft); margin-bottom: 0; }
+.figure-text__body .figure-text__tag {
+  display: inline-block;
+  background: var(--color-secondary);
+  color: var(--color-soft);
+  border: 1px solid var(--color-line);
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+}
 
 .pain-list, .benefit-list {
   display: flex;
@@ -1301,11 +1423,14 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     gap: 32px;
   }
   .course-card { grid-template-columns: 1fr; }
-  .course-card__image { min-height: 260px; }
+  .course-card__image { min-height: 0; width: 100%; }
+  .course-card__image img { position: static; }
   .signup-card { position: static; }
   .footer__grid { grid-template-columns: 1fr 1fr; }
   /* 師資介紹：平板以下改單欄 */
   .teachers-couple__grid { grid-template-columns: 1fr; }
+  .figure-text { grid-template-columns: 1fr; }
+  .figure-text img { height: 220px; }
 }
 
 @media (max-width: 720px) {
@@ -1338,6 +1463,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   .floating { left: 16px; right: auto; bottom: 76px; }
 
   .charity, .guarantee-box { padding: 32px 24px; }
+
+  .photo-banner { min-height: 420px; }
+  .photo-banner__content { padding: 40px 24px; }
 
   /* 課程實況區：手機 2 欄 */
   .real-grid { grid-template-columns: 1fr 1fr; }
