@@ -347,7 +347,10 @@ async function handleApplicationCreate(request, env) {
   if (count >= 5) {
     return json({ ok: false, error: "送出太頻繁，請稍後再試" }, 429);
   }
-  await env.CONTENT.put(rlKey, String(count + 1), { metadata: { t: start } });
+  await env.CONTENT.put(rlKey, String(count + 1), {
+    metadata: { t: start },
+    expirationTtl: 120,
+  });
 
   /* 驗證欄位 */
   const course = String(body.course || "").trim();

@@ -46,7 +46,7 @@
         esc(course.subtitle) +
         "）</span>"
       : "";
-    var fee = String(course.fee || "").replace(
+    var fee = esc(course.fee || "").replace(
       /^(\$[\d,]+)\s*\/\s*人$/,
       '<strong style="color:var(--color-accent);font-size:1.15rem;">$1</strong> ／ 人'
     );
@@ -261,7 +261,7 @@
     if (title && course.title) title.innerHTML = "✨ " + esc(course.title) + " ✨";
     var price = card.querySelector(".signup-card__price");
     if (price && course.fee) {
-      var feeClean = String(course.fee).replace(" / 人", "");
+      var feeClean = esc(course.fee).replace(" / 人", "");
       var priceSmall = course.time ? "4 小時・小班精緻" : "小班精緻";
       price.innerHTML = feeClean + "<small>" + priceSmall + "</small>";
     }
