@@ -463,6 +463,7 @@ var editingKey=null;
 /* eslint-disable-next-line no-unused-vars */
 function openForm(k,id){
   editingKey=k;editingId=id==null?null:id;
+  $("btnSave").disabled=false;
   var row=null;
   if(id!=null){var rows=lists[k]||[];rows.forEach(function(r){if(String(r.id)===String(id))row=r;});}
   $("modalTitle").textContent=row?("編輯 · "+RESOURCES[k].label):("新增 · "+RESOURCES[k].label);
@@ -566,7 +567,7 @@ $("btnSave").addEventListener("click",function(){
     var path="/api/"+editingKey+(editingId?"/"+editingId:"");
     var method=editingId?"PUT":"POST";
     api(path,{method:method,body:JSON.stringify(data)})
-      .then(function(){showMsg("已儲存",true);var k=editingKey;closeForm();switchTab(k);})
+      .then(function(){showMsg("已儲存",true);var k=editingKey;btn.disabled=false;closeForm();switchTab(k);})
       .catch(function(e){showMsg(e.message,false);btn.disabled=false;});
   });
 });
