@@ -191,9 +191,15 @@ async function main() {
     }
 
     for (const item of items) {
-      const key = item.title || item.name || item.year || item.image || "";
-      const found = existing.find(
-        (x) => String(x.title || x.name || x.year || x.image || "") === String(key)
+      /* 唯一鍵：exhibitions 用 year+title（同標題不同年份多筆），其餘資源用主要名稱欄位 */
+      const key =
+        res === "exhibitions"
+          ? item.year + "|" + item.title
+          : item.title || item.name || item.image || "";
+      const found = existing.find((x) =>
+        res === "exhibitions"
+          ? String(x.year + "|" + x.title) === String(key)
+          : String(x.title || x.name || x.image || "") === String(key)
       );
       const url = found ? API + "/api/" + res + "/" + found.id : API + "/api/" + res;
       const r = await fetch(url, {
