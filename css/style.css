@@ -9,6 +9,7 @@
   --color-primary-dark: #1A2E26; /* 水墨 */
   --color-secondary: #F5F0E6;  /* 米白 - 茶紙 */
   --color-accent:    #C9A961;  /* 燙金 - 茶湯光澤 */
+  --color-accent-dark: #A98F4D; /* 深金 - 燙金 hover */
   --color-soft:      #8B7355;  /* 木質 */
   --color-text:      #2A2A2A;
   --color-text-soft: #6B6B6B;
@@ -1045,13 +1046,120 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   transition: all var(--transition);
   color: var(--color-secondary);
 }
-.floating__btn--phone { background: var(--color-primary); }
+.floating__btn--phone { background: var(--color-accent); }
 .floating__btn--fb    { background: #1877F2; }
 .floating__btn:hover {
   transform: translateY(-4px) scale(1.05);
   box-shadow: var(--shadow-lg);
 }
-.floating__btn--phone:hover { background: var(--color-primary-dark); }
+.floating__btn--phone:hover { background: var(--color-accent-dark); }
+
+/* ---------- 12b. 報名 Modal ---------- */
+.signup-modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 46, 38, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.signup-modal {
+  background: var(--color-secondary);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  width: min(560px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  padding: 36px 40px 28px;
+}
+.signup-modal__close {
+  position: absolute;
+  top: 12px; right: 14px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--color-text-soft);
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+}
+.signup-modal__close:hover { color: var(--color-primary); }
+.signup-modal__title {
+  font-family: var(--font-heading);
+  color: var(--color-primary-dark);
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+}
+.signup-modal__course {
+  color: var(--color-primary);
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.signup-modal__course span {
+  color: var(--color-soft);
+  font-weight: 400;
+  font-size: 0.9rem;
+  margin-left: 8px;
+}
+.signup-form { display: flex; flex-direction: column; gap: 14px; }
+.signup-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: var(--color-primary-dark);
+  font-weight: 500;
+}
+.signup-form__field input,
+.signup-form__field select,
+.signup-form__field textarea {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-white);
+  color: var(--color-text);
+  width: 100%;
+}
+.signup-form__field input:focus,
+.signup-form__field select:focus,
+.signup-form__field textarea:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -1px;
+  border-color: var(--color-accent);
+}
+.signup-form__field textarea { resize: vertical; }
+.signup-form__err {
+  color: #B3402A;
+  font-size: 0.9rem;
+}
+.signup-form__submit { width: 100%; }
+.signup-hp {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+}
+.signup-modal__hint {
+  margin-top: 14px;
+  font-size: 0.85rem;
+  color: var(--color-text-soft);
+  text-align: center;
+}
+.signup-done { text-align: center; padding: 8px 0; }
+.signup-done__icon { font-size: 2.6rem; margin-bottom: 10px; }
+.signup-done p { color: var(--color-text); line-height: 1.8; margin-bottom: 12px; }
+.signup-done__close { margin-top: 6px; }
+
+@media (max-width: 480px) {
+  .signup-modal { padding: 28px 20px 22px; }
+}
 
 /* Sticky CTA（手機顯示） */
 .sticky-cta {

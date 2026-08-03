@@ -60,11 +60,10 @@
     if (course.location)
       meta += "<dt>📍 地點</dt><dd>" + esc(course.location.split("（")[0]) + "</dd>";
 
-    var signup = course.signup_url
-      ? '<a href="' +
-        esc(course.signup_url) +
-        '" target="_blank" rel="noopener" class="btn btn--primary">⬇️ 立即報名</a>'
-      : "";
+    var signup =
+      '<button type="button" class="btn btn--primary signup-open" data-course="' +
+      esc(course.title) +
+      '">⬇️ 立即報名</button>';
     return (
       '<article class="course-card fade-in visible">' +
       '<div class="course-card__image">' +
@@ -281,20 +280,16 @@
       if (course.bonus) html += "<dt>🎁 加碼</dt><dd>" + esc(course.bonus) + "</dd>";
       if (course.location)
         html += "<dt>📍 地點</dt><dd>" + esc(course.location).replace("\n", "<br>") + "</dd>";
-      if (course.signup_url)
-        html +=
-          '<dt>📝 報名</dt><dd><a href="' +
-          esc(course.signup_url) +
-          '" target="_blank" rel="noopener" style="color:var(--color-primary);">點此填寫報名表 →</a></dd>';
+      html += "<dt>📝 報名</dt><dd>填寫下方報名表單，或來電 <strong>0919-897-351</strong></dd>";
       meta.innerHTML = html;
     }
 
-    /* 報名按鈕 */
-    if (course.signup_url) {
+    /* 報名按鈕：同步課程名稱 */
+    if (course.title) {
       document
-        .querySelectorAll(".signup-card a.btn--primary, .section--dark a.btn--primary")
+        .querySelectorAll(".signup-card .btn--primary, .section--dark .btn--primary")
         .forEach(function (a) {
-          a.href = course.signup_url;
+          a.setAttribute("data-course", course.title);
         });
     }
   }

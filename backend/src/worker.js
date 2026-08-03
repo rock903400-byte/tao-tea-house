@@ -13,6 +13,8 @@ const ALLOWED_ORIGINS = [
   "http://localhost:8787",
   "http://localhost:5500",
   "http://127.0.0.1:5500",
+  "http://localhost:8080",
+  "http://127.0.0.1:8080",
 ];
 
 /* ---------------- 資源定義 ---------------- */
@@ -30,12 +32,14 @@ const RESOURCES = {
       "capacity",
       "bonus",
       "location",
-      "signup_url",
       "detail_url",
       "image",
       "published",
       "sort_order",
     ],
+  },
+  applications: {
+    fields: ["course", "name", "phone", "email", "adults", "note", "status"],
   },
   teachers: {
     fields: ["name", "title", "bio", "image", "sort_order"],
@@ -310,6 +314,66 @@ async function handlePublicData(env) {
   });
 }
 
+/* ---------------- 報名表單（公開） ---------------- */
+
+async function handleApplicationCreate(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ ok: false, error: "無法解析請求內容" }, 400);
+  }
+
+  /* honeypot：機器人會填隱藏欄位，直接回傳假成功但不寫入 */
+  if (body.website) return json({ ok: true });
+
+  /* 簡易 rate limit：每 IP 每分鐘最多 5 筆 */
+  const ip =
+    request.headers.get("CF-Connecting-IP") ||
+    (request.headers.get("x-forwarded-for") || "").split(",")[0].trim() ||
+    "unknown";
+  const now = Date.now();
+  const rlKey = "app-rl:" + ip;
+  const got = await env.CONTENT.getWithMetadata(rlKey);
+  let count = 0;
+  let start = now;
+  if (got && got.value != null && got.metadata && got.metadata.t) {
+    if (now - got.metadata.t < 60000) {
+      count = parseInt(got.value, 10) || 0;
+      start = got.metadata.t;
+    }
+  }
+  if (count >= 5) {
+    return json({ ok: false, error: "送出太頻繁，請稍後再試" }, 429);
+  }
+  await env.CONTENT.put(rlKey, String(count + 1), { metadata: { t: start } });
+
+  /* 驗證欄位 */
+  const course = String(body.course || "").trim();
+  const name = String(body.name || "").trim();
+  const phone = String(body.phone || "").trim();
+  const email = String(body.email || "").trim();
+  const note = String(body.note || "").trim();
+  const adults = Math.min(Math.max(parseInt(body.adults, 10) || 1, 1), 10);
+
+  if (!course || !name || !phone) {
+    return json({ ok: false, error: "請填寫課程、姓名與手機號碼" }, 400);
+  }
+  if (!/^[0-9+\-()\s]{7,20}$/.test(phone)) {
+    return json({ ok: false, error: "手機號碼格式不正確" }, 400);
+  }
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return json({ ok: false, error: "Email 格式不正確" }, 400);
+  }
+
+  const result = await env.DB.prepare(
+    "INSERT INTO applications (course, name, phone, email, adults, note) VALUES (?, ?, ?, ?, ?, ?)"
+  )
+    .bind(course, name, phone, email, adults, note)
+    .run();
+  return json({ ok: true, id: result.meta.last_row_id });
+}
+
 /* ---------------- CRUD API ---------------- */
 
 function sanitizeBody(body, resource) {
@@ -329,9 +393,8 @@ function sanitizeBody(body, resource) {
 }
 
 async function handleList(resource, env) {
-  const rows = await env.DB.prepare(
-    `SELECT * FROM ${resource} ORDER BY sort_order ASC, id ASC`
-  ).all();
+  const order = resource === "applications" ? "id DESC" : "sort_order ASC, id ASC";
+  const rows = await env.DB.prepare(`SELECT * FROM ${resource} ORDER BY ${order}`).all();
   return json(rows.results);
 }
 
@@ -489,6 +552,11 @@ async function handleRequest(request, env) {
       return withCors(await handlePublicData(env));
     }
 
+    /* 報名表單（公開） */
+    if (pathname === "/api/applications" && request.method === "POST") {
+      return withCors(await handleApplicationCreate(request, env));
+    }
+
     /* 登出 / 目前身份（需要登入才能登出） */
     if (pathname === "/api/auth/logout") {
       return withCors(await handleLogout(request, env));
@@ -521,7 +589,7 @@ async function handleRequest(request, env) {
 
     /* 資源 CRUD */
     const match = pathname.match(
-      /^\/api\/(courses|teachers|exhibitions|media|services|works)(?:\/(\d+))?$/
+      /^\/api\/(courses|teachers|exhibitions|media|services|works|applications)(?:\/(\d+))?$/
     );
     if (match) {
       const resource = match[1];

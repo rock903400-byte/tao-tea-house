@@ -104,6 +104,19 @@ CREATE TABLE IF NOT EXISTS settings (
   value TEXT DEFAULT ''
 );
 
+-- 報名表單
+CREATE TABLE IF NOT EXISTS applications (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  course TEXT NOT NULL,
+  name TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  email TEXT DEFAULT '',
+  adults INTEGER NOT NULL DEFAULT 1,
+  note TEXT DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'new',
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
 CREATE INDEX IF NOT EXISTS idx_exhibitions_sort ON exhibitions(sort_order);
 CREATE INDEX IF NOT EXISTS idx_works_sort ON works(sort_order);

@@ -342,6 +342,143 @@ test("上傳成功存 KV → /img/ 讀回同 bytes；不存在 404", async () =>
   assert.equal(missing.status, 404);
 });
 
+/* ---------- 報名表單 ---------- */
+
+test("報名：公開 POST 成功寫入，後台可查且依 id 新→舊", async () => {
+  const { env } = createEnv();
+  await seedAdmin(env);
+  const { cookie } = await doLogin(env);
+
+  const post = (body) =>
+    worker.fetch(
+      req("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "CF-Connecting-IP": "1.2.3.4" },
+        body: JSON.stringify(body),
+      }),
+      env,
+      {}
+    );
+
+  const first = await post({
+    course: "識茶學體驗課",
+    name: "王小明",
+    phone: "0912-345-678",
+    email: "a@b.com",
+    adults: 2,
+    note: "想了解細節",
+  });
+  assert.equal(first.status, 200);
+  const firstBody = await first.json();
+  assert.equal(firstBody.ok, true);
+  assert.ok(firstBody.id > 0);
+
+  const second = await post({
+    course: "緞泥手捏陶藝課",
+    name: "陳小花",
+    phone: "0933-111-222",
+    adults: 1,
+  });
+  assert.equal(second.status, 200);
+
+  const list = await worker.fetch(
+    req("/api/applications", { headers: { Cookie: cookie } }),
+    env,
+    {}
+  );
+  const rows = await list.json();
+  assert.equal(rows.length, 2);
+  assert.equal(rows[0].name, "陳小花");
+  assert.equal(rows[1].name, "王小明");
+  assert.equal(rows[0].status, "new");
+});
+
+test("報名：honeypot 欄位回傳成功但不寫入", async () => {
+  const { env } = createEnv();
+  await seedAdmin(env);
+  const { cookie } = await doLogin(env);
+
+  const res = await worker.fetch(
+    req("/api/applications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        course: "識茶學體驗課",
+        name: "bot",
+        phone: "0912345678",
+        website: "http://spam",
+      }),
+    }),
+    env,
+    {}
+  );
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.equal(body.ok, true);
+
+  const list = await worker.fetch(
+    req("/api/applications", { headers: { Cookie: cookie } }),
+    env,
+    {}
+  );
+  const rows = await list.json();
+  assert.equal(rows.length, 0);
+});
+
+test("報名：缺必填欄位或手機格式錯誤回 400", async () => {
+  const { env } = createEnv();
+  const post = (body) =>
+    worker.fetch(
+      req("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }),
+      env,
+      {}
+    );
+
+  const noName = await post({ course: "識茶學體驗課", phone: "0912345678" });
+  assert.equal(noName.status, 400);
+
+  const badPhone = await post({ course: "識茶學體驗課", name: "王小明", phone: "abc" });
+  assert.equal(badPhone.status, 400);
+
+  const badEmail = await post({
+    course: "識茶學體驗課",
+    name: "王小明",
+    phone: "0912345678",
+    email: "not-an-email",
+  });
+  assert.equal(badEmail.status, 400);
+});
+
+test("報名：同 IP 每分鐘超過 5 筆回 429", async () => {
+  const { env } = createEnv();
+  const post = () =>
+    worker.fetch(
+      req("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "CF-Connecting-IP": "9.9.9.9" },
+        body: JSON.stringify({ course: "識茶學體驗課", name: "王小明", phone: "0912345678" }),
+      }),
+      env,
+      {}
+    );
+  for (let i = 0; i < 5; i++) {
+    const r = await post();
+    assert.equal(r.status, 200);
+  }
+  const sixth = await post();
+  assert.equal(sixth.status, 429);
+});
+
+test("報名：未登入無法查詢報名列表", async () => {
+  const { env } = createEnv();
+  const res = await worker.fetch(req("/api/applications"), env, {});
+  assert.equal(res.status, 401);
+});
+
 /* ---------- 路由 / CORS ---------- */
 
 test("未知 API 登入後回 404，未登入回 401", async () => {

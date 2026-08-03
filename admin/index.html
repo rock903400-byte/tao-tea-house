@@ -198,11 +198,24 @@ var RESOURCES = {
     { name: "capacity", label: "名額（如：限 6 人）", type: "text" },
     { name: "bonus", label: "報名好禮（如：送茶葉一包）", type: "text" },
     { name: "location", label: "地點", type: "text" },
-    { name: "signup_url", label: "報名表單網址", type: "url" },
     { name: "detail_url", label: "詳情頁路徑（如：course-pottery.html）", type: "text" },
     { name: "image", label: "課程圖片", type: "image" },
     { name: "published", label: "在網站上顯示", type: "check", def: 1 },
     { name: "sort_order", label: "排序（數字越小越前面）", type: "number" }
+  ]},
+  applications: { label: "報名", list: ["course", "name", "phone", "adults", "status", "created_at"], fields: [
+    { name: "course", label: "課程", type: "text", required: true },
+    { name: "name", label: "姓名", type: "text", required: true },
+    { name: "phone", label: "手機", type: "text", required: true },
+    { name: "email", label: "Email", type: "text" },
+    { name: "adults", label: "人數", type: "number" },
+    { name: "note", label: "備註", type: "textarea" },
+    { name: "status", label: "狀態", type: "select", options: [
+      { value: "new", label: "新報名" },
+      { value: "contacted", label: "已聯繫" },
+      { value: "done", label: "已完成" },
+      { value: "cancelled", label: "已取消" }
+    ]}
   ]},
   teachers: { label: "師資", list: ["image", "name", "title"], fields: [
     { name: "name", label: "姓名", type: "text", required: true },
@@ -338,8 +351,8 @@ var lists={};
 
 function initApp(){
   var tabBar=$("tabs");tabBar.innerHTML="";
-  var keys=["courses","teachers","exhibitions","media","services","works","settings"];
-  var icons={courses:"📚 課程",teachers:"👩‍🎓 師資",exhibitions:"🏛 參展",media:"📰 媒體",services:"🛎 服務",works:"🖼 作品",settings:"📞 聯絡資訊"};
+  var keys=["courses","applications","teachers","exhibitions","media","services","works","settings"];
+  var icons={courses:"📚 課程",applications:"📋 報名",teachers:"👩‍🎓 師資",exhibitions:"🏛 參展",media:"📰 媒體",services:"🛎 服務",works:"🖼 作品",settings:"📞 聯絡資訊"};
   keys.forEach(function(k){
     var b=document.createElement("button");
     b.textContent=icons[k];b.dataset.tab=k;
@@ -390,6 +403,10 @@ function renderTable(k,panel){
         else if(n==="published"){
           html+="<td data-label='顯示'>"+(Number(v)?"✅":"—")+"</td>";
         }
+        else if(n==="status"){
+          var stMap={new:"🆕 新報名",contacted:"📞 已聯繫",done:"✅ 已完成",cancelled:"✕ 已取消"};
+          html+="<td data-label='狀態'>"+(stMap[v]||esc(v||""))+"</td>";
+        }
         else if(f&&f.type==="url"&&v){
           html+="<td data-cell='link'><a class='link-btn' href='"+esc(v)+"' target='_blank' rel='noopener'>開啟 ↗</a></td>";
         }
@@ -400,8 +417,10 @@ function renderTable(k,panel){
         }
       });
       html+="<td data-cell='actions'><div class='rowbtns'>";
-      html+="<button class='up' onclick='moveRow(\""+k+"\","+ri+",-1)' title='上移'>↑</button>";
-      html+="<button class='down' onclick='moveRow(\""+k+"\","+ri+",1)' title='下移'>↓</button>";
+      if(k!=="applications"){
+        html+="<button class='up' onclick='moveRow(\""+k+"\","+ri+",-1)' title='上移'>↑</button>";
+        html+="<button class='down' onclick='moveRow(\""+k+"\","+ri+",1)' title='下移'>↓</button>";
+      }
       html+="<button class='edit' onclick='openForm(\""+k+"\","+r.id+")'>編輯</button>";
       html+="<button class='del' onclick='delRow(\""+k+"\","+r.id+")'>刪除</button>";
       html+="</div></td></tr>";
@@ -465,6 +484,15 @@ function openForm(k,id){
     }
     else if(f.type==="check"){
       html+='<label class="check"><input type="checkbox" data-field="'+f.name+'" '+(Number(val)||(f.def&&v==null)?"checked":"")+'> '+f.label+'</label>';
+    }
+    else if(f.type==="select"){
+      html+='<label>'+f.label+'</label><select data-field="'+f.name+'">';
+      (f.options||[]).forEach(function(o){
+        var ov=typeof o==="object"?o.value:o;
+        var ol=typeof o==="object"?o.label:o;
+        html+='<option value="'+esc(ov)+'"'+(String(val)===String(ov)?" selected":"")+'>'+esc(ol)+'</option>';
+      });
+      html+='</select>';
     }
     else if(f.type==="number"){
       html+='<label>'+f.label+'</label><input type="number" data-field="'+f.name+'" value="'+esc(val)+'">';
