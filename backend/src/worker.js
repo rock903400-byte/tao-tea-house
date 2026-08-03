@@ -10,6 +10,7 @@ const RATE_WINDOW = 900;
 
 const ALLOWED_ORIGINS = [
   "https://rock903400-byte.github.io",
+  "https://tao-tea-house.pages.dev",
   "http://localhost:8787",
   "http://localhost:5500",
   "http://127.0.0.1:5500",

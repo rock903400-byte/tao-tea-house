@@ -1,0 +1,9 @@
+backend/
+test/
+node_modules/
+.git/
+.wrangler/
+eslint.config.js
+package.json
+package-lock.json
+.assetsignore
