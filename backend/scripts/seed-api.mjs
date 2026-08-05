@@ -157,7 +157,7 @@ const seed = {
     email: "tcbmas5116@yahoo.com.tw",
     facebook: "https://www.facebook.com/profile.php?id=61585885331413",
     hours: "採預約制，歡迎來電或 FB 訊息聯繫安排參觀",
-    map_query: "台南市新營區三民路92-2號",
+    map_query: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d916.0573250235559!2d120.31474746947222!3d23.30743783035037!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x346e8595bf597b75%3A0x6a0703d6c47485d4!2z55yJ5bqP772c5Y-w5Y2X6ZaL6YGL5L-u55yJ!5e0!3m2!1szh-TW!2stw!4v1785912403544!5m2!1szh-TW!2stw",
   },
 };
 

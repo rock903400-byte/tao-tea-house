@@ -193,12 +193,10 @@
         "</p></div></div>";
     }
 
-    /* 地圖 */
-    if (s.map_query) {
+    /* 地圖（map_query 需為 Google Maps「嵌入地圖」的完整網址，舊版關鍵字格式直接忽略） */
+    if (s.map_query && s.map_query.indexOf("http") === 0) {
       var iframe = document.querySelector(".contact__map iframe");
-      if (iframe)
-        iframe.src =
-          "https://www.google.com/maps?q=" + encodeURIComponent(s.map_query) + "&output=embed";
+      if (iframe) iframe.src = s.map_query;
     }
 
     /* Footer 聯絡資訊 */
