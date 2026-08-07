@@ -188,6 +188,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 /* ---------- 2. Hero ---------- */
 .hero {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1199,6 +1200,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   letter-spacing: 0.1em;
   font-size: 0.92rem;
   padding: 10px 8px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid rgba(201,169,97,0.5);
   border-radius: var(--radius);
   text-align: center;
@@ -1588,7 +1593,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   /* 漢堡選單 */
   .navbar__menu {
     position: fixed;
-    top: 70px; right: -100%;
+    top: 100%;
+    right: -100%;
     width: 80%; max-width: 320px;
     height: calc(100vh - 70px);
     background: var(--color-secondary);
@@ -1605,6 +1611,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
   .gallery__grid { grid-template-columns: 1fr 1fr; }
   .footer__grid { grid-template-columns: 1fr; gap: 32px; }
+  .footer { padding-bottom: 92px; }
 
   .sticky-cta, .sticky-cta--row { display: block; }
   /* 手機 floating 移到左下，避免和 sticky CTA 打架 */
@@ -1627,6 +1634,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   .gallery__grid { grid-template-columns: 1fr; }
   .navbar__logo-en { display: none; }
   .hero__actions .btn { width: 100%; }
+  .hero__scroll { display: none; }
+  .course-card__body { padding: 24px 20px; }
+  .photo-banner__actions .btn { width: 100%; }
 }
 
 /* 列印優化 */
