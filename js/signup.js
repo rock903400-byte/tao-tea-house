@@ -7,10 +7,33 @@
   "use strict";
 
   var API_BASE = "https://tao-tea-house-api.rock903400.workers.dev";
+
+  /* 靜態後備（API 無法連線時使用）；有 API 資料時以 live.js 存的 window.__COURSES__ 優先 */
   var COURSE_INFO = {
     識茶學體驗課: { fee: "$1,000", schedule: "8/9（日）下午 13:00～17:00" },
-    緞泥手捏陶藝課: { fee: "$8,000", schedule: "8/30 起每週日・共 12 堂" },
+    緞泥手捏陶藝課: { fee: "$8,000", schedule: "8/29 起週六日・共 12 堂" },
   };
+
+  function shortDate(s) {
+    var m = String(s || "").match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (m) return +m[2] + "/" + +m[3] + String(s).replace(/(\d{4})-(\d{1,2})-(\d{1,2})/, "");
+    return String(s || "");
+  }
+
+  /* 依課程名稱從後台資料取得資訊；找不到才用靜態後備 */
+  function courseInfo(course) {
+    var list = (typeof window !== "undefined" && window.__COURSES__) || [];
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].title === course) {
+        return {
+          fee: list[i].fee || (COURSE_INFO[course] && COURSE_INFO[course].fee),
+          schedule:
+            shortDate(list[i].date) || (COURSE_INFO[course] && COURSE_INFO[course].schedule),
+        };
+      }
+    }
+    return COURSE_INFO[course];
+  }
 
   var bg = null;
   var body = null;
@@ -24,7 +47,7 @@
   }
 
   function formHtml(course) {
-    var info = COURSE_INFO[course];
+    var info = courseInfo(course);
     var options = "";
     for (var i = 1; i <= 6; i++) {
       options +=

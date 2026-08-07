@@ -217,17 +217,17 @@
 
   /* ---------- 課程詳情頁（course-tea.html / course-pottery.html） ---------- */
   /* 依目前頁面檔名比對課程 detail_url，找不到則回傳 null（保留靜態內容） */
+  /* Cloudflare Pages 存取時 URL 會省略 .html 副檔名，比對需同時比 .html 與不帶副檔名 */
   function matchCourse(courses) {
-    var path =
-      String(location.pathname || "")
-        .split("/")
-        .pop() || "";
-    if (path.indexOf("course-") !== 0) return null;
+    var path = String(location.pathname || "").split("/").pop() || "";
+    var bare = path.replace(/\.html$/, "");
+    if (bare.indexOf("course-") !== 0) return null;
     for (var i = 0; i < courses.length; i++) {
       var url = String(courses[i].detail_url || "")
         .split("/")
-        .pop();
-      if (url && url === path) return courses[i];
+        .pop()
+        .replace(/\.html$/, "");
+      if (url && (url === bare || url === path)) return courses[i];
     }
     return null;
   }
@@ -290,12 +290,34 @@
           a.setAttribute("data-course", course.title);
         });
     }
+
+    /* 開課日期（course-pottery.html 的 #dates 節） */
+    var dates = document.querySelector("#dates .course-card__meta");
+    if (dates) {
+      var datesHtml = "";
+      var datesText = shortDate(course.date || "");
+      if (datesText) datesHtml += "<dt>📅 開課</dt><dd><strong>" + esc(datesText) + "</strong></dd>";
+      if (course.time)
+        datesHtml += "<dt>🕐 時間</dt><dd>" + esc(course.time).replace("\n", "<br>") + "</dd>";
+      if (course.capacity) datesHtml += "<dt>👥 名額</dt><dd>" + esc(course.capacity) + "</dd>";
+      if (course.fee) datesHtml += "<dt>💰 費用</dt><dd>" + esc(course.fee) + "</dd>";
+      if (course.location)
+        datesHtml +=
+          "<dt>📍 地點</dt><dd>" + esc(course.location).replace("\n", "<br>") + "</dd>";
+      if (datesHtml) dates.innerHTML = datesHtml;
+      var datesSub = document.querySelector("#dates .section-subtitle");
+      if (datesSub && course.date) {
+        var subText = String(shortDate(course.date)).replace(/^(\d+\/\d+)（\d+）/, "$1");
+        datesSub.textContent = subText + "・" + (course.capacity || "小班教學");
+      }
+    }
   }
 
   /* ---------- 主流程 ---------- */
   function apply(data) {
-    /* 課程 */
+    /* 課程（存全域供 signup.js 報名彈窗使用；API 連不上時仍保留靜態內容） */
     if (data.courses && data.courses.length) {
+      window.__COURSES__ = data.courses;
       var courseWrap = document.getElementById("courses-list");
       if (courseWrap) courseWrap.innerHTML = data.courses.map(renderCourse).join("");
     }

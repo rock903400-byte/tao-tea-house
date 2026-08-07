@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>緞泥手捏陶藝課・茶席茶具宣傳海報(A4)｜陶茶雅舍</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#2C4A3E;
+    --primary-deep:#1F362D;
+    --cream:#F5F0E6;
+    --gold:#C9A961;
+    --gold-deep:#A8863F;
+    --ink:#33302A;
+    --text-soft:#6E685C;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{background:#E6DFD0;font-family:"Noto Sans TC",sans-serif;}
+  .page{
+    width:210mm;
+    min-height:297mm;
+    margin:12mm auto;
+    background:
+      radial-gradient(120mm 90mm at 90% -5%, rgba(201,169,97,0.16), transparent 70%),
+      radial-gradient(100mm 80mm at -10% 105%, rgba(44,74,62,0.10), transparent 70%),
+      var(--cream);
+    color:var(--ink);
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 10px 40px rgba(0,0,0,0.25);
+    display:flex;
+    flex-direction:column;
+  }
+  .corner{position:absolute;width:24mm;height:24mm;border:1.2px solid var(--gold);opacity:0.75;}
+  .corner--tl{top:7mm;left:7mm;border-right:none;border-bottom:none;}
+  .corner--br{bottom:7mm;right:7mm;border-left:none;border-top:none;}
+
+  .header{text-align:center;padding:7mm 14mm 0;}
+  .header__logo{width:13mm;height:13mm;object-fit:cover;border-radius:50%;border:1px solid var(--gold);box-shadow:0 2px 8px rgba(201,169,97,0.4);}
+  .header__name{font-family:"Noto Serif TC",serif;font-size:5mm;font-weight:900;color:var(--primary-deep);letter-spacing:0.28em;margin-top:2mm;text-indent:0.28em;}
+  .header__en{font-size:2.5mm;letter-spacing:0.32em;color:var(--gold-deep);margin-top:1mm;}
+
+  .title{margin:2.5mm 0 0;padding:0 16mm;text-align:center;}
+  .title__main{
+    font-family:"Noto Serif TC",serif;
+    font-size:9.5mm;
+    line-height:1.32;
+    font-weight:900;
+    color:var(--primary-deep);
+    letter-spacing:0.12em;
+  }
+  .title__main em{font-style:normal;color:var(--gold-deep);}
+  .title__sub{margin-top:2.4mm;font-size:3.5mm;letter-spacing:0.16em;color:var(--text-soft);}
+
+  .divider{display:flex;align-items:center;justify-content:center;gap:3.5mm;margin:2.5mm auto 0;width:56%;}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--gold);opacity:0.7;}
+  .divider span{color:var(--gold-deep);font-size:3mm;letter-spacing:0.2em;}
+
+  .hero{width:60%;margin:2.5mm auto 0;position:relative;}
+  .hero__img{
+    width:100%;aspect-ratio:16/9;object-fit:cover;display:block;
+    border-radius:2.5mm;
+    border:1.2px solid var(--gold);
+    box-shadow:0 6px 18px rgba(44,74,62,0.25);
+  }
+  .hero__seal{
+    position:absolute;right:-3mm;bottom:-5mm;
+    background:var(--gold);
+    color:var(--cream);
+    font-family:"Noto Serif TC",serif;
+    font-size:3.2mm;
+    font-weight:700;
+    letter-spacing:0.15em;
+    padding:2.2mm 3.4mm;
+    border-radius:1.5mm;
+    box-shadow:0 4px 10px rgba(0,0,0,0.2);
+    transform:rotate(-3deg);
+  }
+
+  .info{display:flex;justify-content:center;gap:7mm;margin:3mm 12mm 0;text-align:center;}
+  .info__icon{font-size:4.6mm;line-height:1.4;}
+  .info__label{font-size:2.8mm;color:var(--text-soft);letter-spacing:0.12em;margin-top:0.8mm;}
+  .info__value{font-family:"Noto Serif TC",serif;font-size:3.8mm;font-weight:700;color:var(--primary-deep);margin-top:0.8mm;}
+
+  .price{margin:3mm 0 0;text-align:center;}
+  .price__amount{font-family:"Noto Serif TC",serif;font-weight:900;color:var(--gold-deep);font-size:8mm;}
+  .price__amount small{font-size:3.8mm;font-weight:700;}
+  .price__note{font-size:2.8mm;color:var(--text-soft);letter-spacing:0.14em;margin-top:0.8mm;}
+
+  .dates{margin:3mm 22mm 0;background:var(--primary);border-radius:3mm;padding:3.6mm 6mm 4.2mm;box-shadow:0 6px 16px rgba(31,54,45,0.35);}
+  .dates__head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid rgba(201,169,97,0.45);padding-bottom:2mm;margin-bottom:3mm;}
+  .dates__title{color:var(--gold);font-family:"Noto Serif TC",serif;font-size:4mm;font-weight:700;letter-spacing:0.2em;}
+  .dates__hint{color:rgba(245,240,230,0.75);font-size:2.6mm;letter-spacing:0.12em;}
+  .dates__grid{display:grid;grid-template-columns:1fr 1fr;gap:1.8mm 6mm;}
+  .date-item{display:flex;align-items:center;gap:2.2mm;color:var(--cream);font-size:3.3mm;letter-spacing:0.08em;line-height:1.6;}
+  .date-item::before{content:"";width:1.5mm;height:1.5mm;border-radius:50%;background:var(--gold);flex:none;}
+
+  .teachers{display:flex;align-items:center;justify-content:center;gap:7mm;margin:3mm 20mm 0;}
+  .teachers__photo{width:20mm;height:20mm;object-fit:cover;border-radius:50%;border:1.2px solid var(--gold);}
+  .teachers__body{text-align:left;}
+  .teachers__tag{color:var(--gold-deep);font-size:2.8mm;letter-spacing:0.18em;font-weight:700;}
+  .teachers__name{font-family:"Noto Serif TC",serif;font-size:4.4mm;font-weight:900;color:var(--primary-deep);letter-spacing:0.1em;margin-top:1mm;}
+  .teachers__desc{font-size:2.8mm;color:var(--text-soft);margin-top:1mm;letter-spacing:0.06em;}
+
+  .contact{margin:auto 24mm 0;padding:3mm 0 5mm;text-align:center;border-top:1px solid var(--gold);}
+  .contact__line{font-size:3.4mm;letter-spacing:0.06em;line-height:2;}
+  .contact__line strong{font-family:"Noto Serif TC",serif;font-weight:900;color:var(--primary-deep);letter-spacing:0.18em;}
+  .contact__line a{color:var(--primary-deep);text-decoration:none;}
+  .contact__fb{font-size:2.7mm;color:var(--text-soft);letter-spacing:0.1em;margin-top:0.8mm;}
+
+  @media print{
+    body{background:#fff;}
+    .page{margin:0;box-shadow:none;width:210mm;min-height:297mm;}
+    @page{size:A4 portrait;margin:0;}
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="corner corner--tl"></div>
+  <div class="corner corner--br"></div>
+
+  <header class="header">
+    <img class="header__logo" src="assets/logo.jpg" alt="陶茶雅舍 logo">
+    <div class="header__name">陶茶雅舍</div>
+    <div class="header__en">Tao · Tea · Art House</div>
+  </header>
+
+  <section class="title">
+    <h1 class="title__main">台灣緞泥<br><em>手捏成型的茶席茶具</em></h1>
+    <p class="title__sub">把台灣緞泥的溫度，捏成一套屬於你的茶席茶具</p>
+  </section>
+
+  <div class="divider"><span>✦ 手捏陶藝完整課程 ✦</span></div>
+
+  <figure class="hero">
+    <img class="hero__img" src="assets/pottery-set.jpg" alt="台灣緞泥手捏茶席茶具全套">
+    <div class="hero__seal">緞泥手作</div>
+  </figure>
+
+  <section class="info">
+    <div class="info__item">
+      <div class="info__icon">🏺</div>
+      <div class="info__label">課程堂數</div>
+      <div class="info__value">12 堂完整課程</div>
+    </div>
+    <div class="info__item">
+      <div class="info__icon">🕐</div>
+      <div class="info__label">上課週期</div>
+      <div class="info__value">週六、日・每次 4 小時</div>
+    </div>
+    <div class="info__item">
+      <div class="info__icon">👥</div>
+      <div class="info__label">教學模式</div>
+      <div class="info__value">小班精緻教學</div>
+    </div>
+  </section>
+
+  <div class="price">
+    <div class="price__amount">$8,000<small> ／ 12 堂</small></div>
+    <p class="price__note">由淺入深・從一團土到一整組茶具</p>
+  </div>
+
+  <section class="dates">
+    <div class="dates__head">
+      <div class="dates__title">開課日期</div>
+      <div class="dates__hint">2026 年・共 12 次</div>
+    </div>
+    <div class="dates__grid">
+      <div class="date-item">8/29（六）</div>
+      <div class="date-item">8/30（日）</div>
+      <div class="date-item">9/12（六）</div>
+      <div class="date-item">9/13（日）</div>
+      <div class="date-item">9/26（六）</div>
+      <div class="date-item">9/27（日）</div>
+      <div class="date-item">10/10（六）</div>
+      <div class="date-item">10/11（日）</div>
+      <div class="date-item">10/24（六）</div>
+      <div class="date-item">10/25（日）</div>
+      <div class="date-item">11/15（日）</div>
+      <div class="date-item">11/25（三）</div>
+    </div>
+  </section>
+
+  <section class="teachers">
+    <img class="teachers__photo" src="assets/teachers.jpg" alt="田清標老師與江秝笙老師">
+    <div class="teachers__body">
+      <div class="teachers__tag">30 年手捏壺職人親授</div>
+      <div class="teachers__name">田清標・江秝笙</div>
+      <div class="teachers__desc">手把手帶你掌握泥的溫度與捏塑節奏</div>
+    </div>
+  </section>
+
+  <footer class="contact">
+    <div class="contact__line">
+      📞 <strong><a href="tel:+886919897351">0919-897-351</a></strong>
+      ｜ 📍 台南市新營區三民路 92-2 號 2 樓（辻間創生聚落 B3 棟 2 樓）
+    </div>
+    <div class="contact__fb">👍 追蹤 FB 粉絲專頁 陶茶雅舍 Tao · Tea · Art House</div>
+  </footer>
+</div>
+
+</body>
+</html>
