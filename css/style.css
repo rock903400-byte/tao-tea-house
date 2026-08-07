@@ -209,7 +209,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   );
   background-size: cover;
   background-position: center;
-  filter: brightness(0.45);
+  filter: brightness(0.3);
   transform: scale(1.05);
   z-index: 0;
 }
@@ -217,7 +217,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(26,46,38,0.4) 0%, rgba(26,46,38,0.7) 100%);
+  background: linear-gradient(180deg, rgba(26,46,38,0.6) 0%, rgba(26,46,38,0.88) 100%);
   z-index: 1;
 }
 .hero__content {
@@ -242,7 +242,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   line-height: 1.3;
   letter-spacing: 0.08em;
   margin-bottom: 24px;
-  text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  text-shadow: 0 3px 12px rgba(0,0,0,0.75);
 }
 .hero__title span { color: var(--color-accent); }
 .hero__subtitle {
