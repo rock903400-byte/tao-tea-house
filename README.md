@@ -1,8 +1,12 @@
 # 陶茶雅舍 Tao · Tea · Art House
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 > 陶藝 × 品茶｜在泥與火之間，找回生活的溫度台南新營・30 年手捏壺職人
 
 品牌形象網＋識茶學/陶藝課報名系統，部署於 Cloudflare Pages，內容由 Cloudflare Worker API（D1）提供。
+
+**線上網站**: https://rock903400-byte.github.io/tao-tea-house/
 
 ---
 
