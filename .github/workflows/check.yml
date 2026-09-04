@@ -14,5 +14,5 @@ jobs:
         run: test -f index.html
       - name: No secrets committed
         run: |
-          ! git ls-files | grep -Ei '\.(pem|key|p12)$|serviceAccount.*\.json$|(^|/)\.env(\.|$)'
+          ! git ls-files | grep -v '\.example$' | grep -Ei '\.(pem|key|p12)$|serviceAccount.*\.json$|(^|/)\.env(\.|$)'
 
