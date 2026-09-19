@@ -1,10 +1,10 @@
 /* 透過 Worker API 匯入種子資料（避免 wrangler 在 Windows 的編碼問題） */
 const API = "https://tao-tea-house-api.rock903400.workers.dev";
-const EMAIL = "tcbmas5116@yahoo.com.tw";
+const EMAIL = process.env.TTH_EMAIL;
 const PASSWORD = process.env.TTH_PASSWORD;
 
-if (!PASSWORD) {
-  console.error("請設定環境變數 TTH_PASSWORD");
+if (!EMAIL || !PASSWORD) {
+  console.error("請設定環境變數 TTH_EMAIL 與 TTH_PASSWORD");
   process.exit(1);
 }
 

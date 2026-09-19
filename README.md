@@ -73,6 +73,7 @@ npx wrangler pages deploy . --project-name tao-tea-house --branch main
 - **重灌種子資料**（會覆蓋後台所有內容，請先確認）：
 
 ```bash
+$env:TTH_EMAIL="你的後台登入 Email"   # PowerShell
 $env:TTH_PASSWORD="你的後台密碼"   # PowerShell
 node backend/scripts/seed-api.mjs
 ```
