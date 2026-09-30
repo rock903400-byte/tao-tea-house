@@ -504,3 +504,170 @@ test("CORS：允許來源回相對標頭", async () => {
   assert.equal(res.status, 200);
   assert.equal(res.headers.get("access-control-allow-origin"), "https://rock903400-byte.github.io");
 });
+
+/* ---------- 資安：CSRF / 圖片路徑 / 上傳 ---------- */
+
+const EVIL = "https://evil.example";
+const GOOD = "https://rock903400-byte.github.io";
+
+test("CSRF：不在白名單的 Origin 不能新增資料（即使帶著有效 cookie、用 text/plain 簡單請求）", async () => {
+  const { env } = createEnv();
+  await seedAdmin(env);
+  const { cookie } = await doLogin(env);
+  const res = await worker.fetch(
+    req("/api/media", {
+      method: "POST",
+      headers: { Cookie: cookie, Origin: EVIL, "Content-Type": "text/plain" },
+      body: JSON.stringify({ type: "報導", title: "被植入", link: "javascript:alert(1)" }),
+    }),
+    env,
+    {}
+  );
+  assert.equal(res.status, 403);
+  const list = await worker.fetch(req("/api/media", { headers: { Cookie: cookie } }), env, {});
+  assert.deepEqual(await list.json(), []);
+});
+
+test("CSRF：Origin 為 null（沙箱 iframe / data: 頁面）同樣拒絕", async () => {
+  const { env } = createEnv();
+  await seedAdmin(env);
+  const { cookie } = await doLogin(env);
+  const res = await worker.fetch(
+    req("/api/media", {
+      method: "POST",
+      headers: { Cookie: cookie, Origin: "null", "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "報導", title: "x" }),
+    }),
+    env,
+    {}
+  );
+  assert.equal(res.status, 403);
+});
+
+test("CSRF：不在白名單的 Origin 不能登出、刪除，登入狀態也不受影響", async () => {
+  const { env } = createEnv();
+  await seedAdmin(env);
+  const { cookie } = await doLogin(env);
+  const out = await worker.fetch(
+    req("/api/auth/logout", { method: "POST", headers: { Cookie: cookie, Origin: EVIL } }),
+    env,
+    {}
+  );
+  assert.equal(out.status, 403);
+  const del = await worker.fetch(
+    req("/api/media/1", { method: "DELETE", headers: { Cookie: cookie, Origin: EVIL } }),
+    env,
+    {}
+  );
+  assert.equal(del.status, 403);
+  const me = await worker.fetch(req("/api/auth/me", { headers: { Cookie: cookie } }), env, {});
+  assert.equal(me.status, 200);
+});
+
+test("CSRF：白名單 Origin + JSON 正常運作；白名單 Origin 但 text/plain 回 415", async () => {
+  const { env } = createEnv();
+  await seedAdmin(env);
+  const { cookie } = await doLogin(env);
+  const ok = await worker.fetch(
+    req("/api/media", {
+      method: "POST",
+      headers: { Cookie: cookie, Origin: GOOD, "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "報導", title: "正常" }),
+    }),
+    env,
+    {}
+  );
+  assert.equal(ok.status, 200);
+  const plain = await worker.fetch(
+    req("/api/media", {
+      method: "POST",
+      headers: { Cookie: cookie, Origin: GOOD, "Content-Type": "text/plain" },
+      body: JSON.stringify({ type: "報導", title: "x" }),
+    }),
+    env,
+    {}
+  );
+  assert.equal(plain.status, 415);
+});
+
+test("公開報名表單：白名單 Origin 仍可送出；跨站 Origin 被擋", async () => {
+  const { env } = createEnv();
+  const body = JSON.stringify({ course: "手捏壺", name: "王小明", phone: "0912345678" });
+  const good = await worker.fetch(
+    req("/api/applications", {
+      method: "POST",
+      headers: { Origin: GOOD, "Content-Type": "application/json", "CF-Connecting-IP": "1.1.1.1" },
+      body,
+    }),
+    env,
+    {}
+  );
+  assert.equal(good.status, 200);
+  const evil = await worker.fetch(
+    req("/api/applications", {
+      method: "POST",
+      headers: { Origin: EVIL, "Content-Type": "application/json", "CF-Connecting-IP": "2.2.2.2" },
+      body,
+    }),
+    env,
+    {}
+  );
+  assert.equal(evil.status, 403);
+});
+
+test("/img/ 只提供 photo: 開頭的圖片，不能讀 KV 裡其他資料（如限流計數）", async () => {
+  const { env } = createEnv();
+  await env.CONTENT.put("app-rl:9.9.9.9", "3", { metadata: { t: Date.now() } });
+  await env.CONTENT.put("internal-secret", btoa("do-not-leak"), {
+    metadata: { type: "text/plain" },
+  });
+  for (const key of ["app-rl:9.9.9.9", "internal-secret", "%E0%A4%A"]) {
+    const res = await worker.fetch(req("/img/" + encodeURIComponent(key)), env, {});
+    assert.equal(res.status, 404, key);
+  }
+  const malformed = await worker.fetch(req("/img/%E0%A4%A"), env, {});
+  assert.equal(malformed.status, 404);
+});
+
+test("上傳只收圖片：text/html、octet-stream 回 415；圖片以伺服器端類型回傳並帶 nosniff", async () => {
+  const { env } = createEnv();
+  await seedAdmin(env);
+  const { cookie } = await doLogin(env);
+  for (const type of ["text/html", "application/octet-stream", "image/svg+xml"]) {
+    const res = await worker.fetch(
+      req("/api/upload", {
+        method: "POST",
+        headers: { Cookie: cookie, "Content-Type": type, "X-File-Name": "a.jpg" },
+        body: new Uint8Array([1, 2, 3]),
+      }),
+      env,
+      {}
+    );
+    assert.equal(res.status, 415, type);
+  }
+  const up = await worker.fetch(
+    req("/api/upload", {
+      method: "POST",
+      headers: { Cookie: cookie, "Content-Type": "image/png", "X-File-Name": "a.png" },
+      body: new Uint8Array([0x89, 0x50, 0x4e, 0x47]),
+    }),
+    env,
+    {}
+  );
+  assert.equal(up.status, 200);
+  const { url } = await up.json();
+  const img = await worker.fetch(req(url), env, {});
+  assert.equal(img.headers.get("content-type"), "image/png");
+  assert.equal(img.headers.get("x-content-type-options"), "nosniff");
+  assert.match(img.headers.get("content-security-policy"), /sandbox/);
+});
+
+test("登入：不存在的帳號與密碼錯誤回應相同（不可列舉帳號）", async () => {
+  const { env } = createEnv();
+  await seedAdmin(env);
+  const unknown = await doLogin(env, "nobody@taoteahouse.test", "whatever-123");
+  const wrong = await doLogin(env, EMAIL, "wrong-password");
+  assert.equal(unknown.res.status, 401);
+  assert.equal(wrong.res.status, 401);
+  assert.deepEqual(await unknown.res.json(), await wrong.res.json());
+});

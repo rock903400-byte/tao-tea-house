@@ -88,6 +88,34 @@ function cleanValue(v) {
   return String(v).trim();
 }
 
+/* 逐字元比較，不因第一個不同就提早結束，避免用回應時間推測雜湊。 */
+function safeEqual(a, b) {
+  const x = String(a);
+  const y = String(b);
+  let diff = x.length ^ y.length;
+  for (let i = 0; i < Math.max(x.length, y.length); i++) {
+    diff |= (x.charCodeAt(i) || 0) ^ (y.charCodeAt(i) || 0);
+  }
+  return diff === 0;
+}
+
+function isJsonRequest(request) {
+  return /^application\/json\b/i.test(request.headers.get("Content-Type") || "");
+}
+
+/* 帳號不存在時仍算一次雜湊，讓兩種失敗耗時相近，無法用回應時間列舉帳號。 */
+const DUMMY_SALT = "00".repeat(16);
+
+/* 允許上傳的圖片：副檔名 → 伺服器端決定的 Content-Type（不採用用戶端宣告的值） */
+const IMAGE_TYPES = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  gif: "image/gif",
+};
+const IMAGE_MIMES = new Set(Object.values(IMAGE_TYPES));
+
 /* ---------------- 認證工具 ---------------- */
 
 function getCookie(request, name) {
@@ -218,12 +246,13 @@ async function handleLogin(request, env) {
 
   const admin = await env.DB.prepare("SELECT * FROM admins WHERE email = ?").bind(email).first();
   if (!admin) {
+    await hashPassword(password, DUMMY_SALT);
     await recordFailure(env, key);
     return json({ ok: false, error: "帳號或密碼錯誤" }, 401);
   }
 
   const hash = await hashPassword(password, admin.salt);
-  if (hash !== admin.password_hash) {
+  if (!safeEqual(hash, admin.password_hash)) {
     await recordFailure(env, key);
     return json({ ok: false, error: "帳號或密碼錯誤" }, 401);
   }
@@ -268,7 +297,7 @@ async function handleChangePassword(request, env) {
   if (!row) return json({ ok: false, error: "帳號不存在" }, 404);
 
   const currentHash = await hashPassword(current, row.salt);
-  if (currentHash !== row.password_hash) {
+  if (!safeEqual(currentHash, row.password_hash)) {
     return json({ ok: false, error: "目前的密碼不正確" }, 401);
   }
 
@@ -485,12 +514,16 @@ function arrayBufferToBase64(buf) {
 }
 
 async function handleUpload(request, env) {
-  const contentType = request.headers.get("Content-Type") || "application/octet-stream";
+  /* 只收圖片：用戶端宣告的 Content-Type 必須是圖片類型，存入與回傳時一律用伺服器端的對照值 */
+  const declared = (request.headers.get("Content-Type") || "").split(";")[0].trim().toLowerCase();
+  if (!IMAGE_MIMES.has(declared)) {
+    return json({ ok: false, error: "僅接受 JPG / PNG / WebP / GIF 圖片" }, 415);
+  }
   const fileName = request.headers.get("X-File-Name") || "";
   const extMatch = fileName.match(/\.([a-zA-Z0-9]+)$/);
   const ext = extMatch ? extMatch[1].toLowerCase() : "jpg";
-  const allowedExt = ["jpg", "jpeg", "png", "webp", "gif"];
-  const safeExt = allowedExt.includes(ext) ? ext : "jpg";
+  const safeExt = Object.hasOwn(IMAGE_TYPES, ext) ? ext : "jpg";
+  const contentType = IMAGE_TYPES[safeExt];
 
   const bytes = await request.arrayBuffer();
   if (bytes.byteLength > 5 * 1024 * 1024) {
@@ -506,16 +539,28 @@ async function handleUpload(request, env) {
 }
 
 async function handleImage(request, env, pathname) {
-  const key = decodeURIComponent(pathname.slice("/img/".length)).slice(0, 256);
+  let key;
+  try {
+    key = decodeURIComponent(pathname.slice("/img/".length)).slice(0, 256);
+  } catch {
+    return json({ ok: false, error: "圖片不存在" }, 404);
+  }
+  /* KV 命名空間裡還放著限流計數等內部資料，只有 photo: 開頭的才是圖片，其餘一律當不存在 */
+  if (!key.startsWith("photo:")) {
+    return json({ ok: false, error: "圖片不存在" }, 404);
+  }
   const got = await env.CONTENT.getWithMetadata(key);
   if (!got || got.value == null) {
     return json({ ok: false, error: "圖片不存在" }, 404);
   }
+  const type = got.metadata && got.metadata.type;
   const bin = Uint8Array.from(atob(got.value), (c) => c.charCodeAt(0));
   return new Response(bin, {
     headers: {
-      "Content-Type": (got.metadata && got.metadata.type) || "image/jpeg",
+      "Content-Type": IMAGE_MIMES.has(type) ? type : "image/jpeg",
       "Cache-Control": "public, max-age=31536000, immutable",
+      "X-Content-Type-Options": "nosniff",
+      "Content-Security-Policy": "default-src 'none'; sandbox",
     },
   });
 }
@@ -538,6 +583,24 @@ async function handleRequest(request, env) {
     for (const [k, v] of Object.entries(cors)) r.headers.set(k, v);
     return r;
   };
+
+  /* CSRF 防護。登入 cookie 是 SameSite=None（網站與 API 不同網域所必須），瀏覽器會在任何
+     網站發出的請求帶上它，CORS 白名單只管「能不能讀回應」、擋不了「請求有沒有被執行」。
+     所以所有會改資料的請求：(1) 瀏覽器一定會帶 Origin，不在白名單就拒絕（含 "null"）；
+     (2) 會解析 JSON 的端點必須是 application/json——text/plain 屬於不需預檢的「簡單請求」，
+     攻擊頁面可以直接送出。沒有 Origin 的呼叫（curl、seed 腳本）不是跨站瀏覽器請求，照常放行。 */
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    if (origin && !allowed) {
+      return json({ ok: false, error: "來源不被允許" }, 403);
+    }
+    const parsesJson =
+      (request.method === "POST" || request.method === "PUT") &&
+      pathname !== "/api/upload" &&
+      pathname !== "/api/auth/logout";
+    if (parsesJson && !isJsonRequest(request)) {
+      return withCors(json({ ok: false, error: "Content-Type 必須是 application/json" }, 415));
+    }
+  }
 
   /* 圖片（公開） */
   if (request.method === "GET" && pathname.startsWith("/img/")) {
