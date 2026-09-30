@@ -14,7 +14,24 @@
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  /* 連結網址白名單：esc() 只擋 HTML 注入，擋不住 href="javascript:..."。
+     只放行 http(s) / mailto / tel 與站內相對路徑，其餘一律回空字串。
+     先去掉瀏覽器解析 scheme 時會忽略的空白與控制字元，避免 "java\tscript:" 這類繞過。 */
+  function safeHref(u) {
+    var s = String(u == null ? "" : u).trim();
+    if (!s) return "";
+    var probe = "";
+    for (var i = 0; i < s.length; i++) {
+      var c = s.charCodeAt(i);
+      if (c > 32 && (c < 127 || c > 159)) probe += s.charAt(i);
+    }
+    var m = /^([a-zA-Z][a-zA-Z0-9+.-]*):/.exec(probe);
+    if (m && !/^(https?|mailto|tel)$/i.test(m[1])) return "";
+    return s;
   }
 
   /* 圖片網址：後台上傳的 /img/ 開頭需接 API 網域；http 開頭直接用；其餘為站內相對路徑 */
@@ -82,9 +99,9 @@
       (meta ? '<dl class="course-card__meta">' + meta + "</dl>" : "") +
       '<div style="display:flex;gap:12px;flex-wrap:wrap;">' +
       signup +
-      (course.detail_url
+      (safeHref(course.detail_url)
         ? '<a href="' +
-          esc(course.detail_url) +
+          esc(safeHref(course.detail_url)) +
           '" class="btn btn--ghost" style="color:var(--color-primary);border-color:var(--color-primary);">查看詳情 →</a>'
         : "") +
       "</div></div></article>"
@@ -152,9 +169,9 @@
       esc(m.title) +
       "</h3>" +
       (m.description ? '<p class="media-card__desc">' + esc(m.description) + "</p>" : "") +
-      (m.link
+      (safeHref(m.link)
         ? '<a href="' +
-          esc(m.link) +
+          esc(safeHref(m.link)) +
           '" target="_blank" rel="noopener" class="media-card__link">' +
           linkText +
           "</a>"
@@ -177,14 +194,14 @@
         '<div class="contact__item"><div class="contact__icon">📞</div><div>' +
         '<p class="contact__label">PHONE</p>' +
         '<p class="contact__value"><a href="' +
-        esc(s.phone_href || "tel:" + s.phone) +
+        esc(safeHref(s.phone_href) || "tel:" + s.phone) +
         '">' +
         esc(s.phone) +
         "</a></p></div></div>" +
         '<div class="contact__item"><div class="contact__icon">👍</div><div>' +
         '<p class="contact__label">FACEBOOK</p>' +
         '<p class="contact__value"><a href="' +
-        esc(s.facebook) +
+        esc(safeHref(s.facebook)) +
         '" target="_blank" rel="noopener">陶茶雅舍 粉絲專頁｜FB 訊息聯繫</a></p></div></div>' +
         '<div class="contact__item"><div class="contact__icon">🕐</div><div>' +
         '<p class="contact__label">OPEN HOURS</p>' +
@@ -202,7 +219,7 @@
     /* Footer 聯絡資訊 */
     var footPhone = document.querySelector('.footer__col a[href^="tel:"]');
     if (footPhone && s.phone) {
-      footPhone.href = s.phone_href || "tel:" + s.phone;
+      footPhone.href = safeHref(s.phone_href) || "tel:" + s.phone;
       footPhone.textContent = s.phone;
     }
     var footAddr = document.querySelector(".footer__col li:not(:first-child):not(:last-child)");
@@ -210,9 +227,9 @@
 
     /* Floating 按鈕 */
     var floatPhone = document.querySelector(".floating__btn--phone");
-    if (floatPhone && s.phone) floatPhone.href = s.phone_href || "tel:" + s.phone;
+    if (floatPhone && s.phone) floatPhone.href = safeHref(s.phone_href) || "tel:" + s.phone;
     var floatFb = document.querySelector(".floating__btn--fb");
-    if (floatFb && s.facebook) floatFb.href = s.facebook;
+    if (floatFb && safeHref(s.facebook)) floatFb.href = safeHref(s.facebook);
   }
 
   /* ---------- 課程詳情頁（course-tea.html / course-pottery.html） ---------- */

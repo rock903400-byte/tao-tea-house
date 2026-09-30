@@ -262,7 +262,9 @@ var SETTING_FIELDS = [
 ];
 
 /* ---- 工具 ---- */
-function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+/* 連結白名單：esc() 擋不住 href="javascript:..."。只放行 http(s)/mailto/tel 與相對路徑。 */
+function safeHref(u){var s=String(u==null?"":u).trim();if(!s)return "";var probe="";for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);if(c>32&&(c<127||c>159))probe+=s.charAt(i);}var m=/^([a-zA-Z][a-zA-Z0-9+.-]*):/.exec(probe);if(m&&!/^(https?|mailto|tel)$/i.test(m[1]))return "";return s;}
 function $(id){return document.getElementById(id);}
 function showMsg(t,ok){var m=$("msg");m.textContent=t;m.className=ok?"ok":"err";setTimeout(function(){m.className="";},4000);}
 
@@ -398,7 +400,7 @@ function renderTable(k,panel){
         var f=null;fields.forEach(function(x){if(x.name===n)f=x;});
         var v=r[n];
         if(f&&f.type==="image"){
-          html+="<td data-cell='thumb'>"+(v?'<img class="thumb" src="'+imgUrl(v)+'" alt="">':'<span style="color:#b0a48c">無</span>')+"</td>";
+          html+="<td data-cell='thumb'>"+(v?'<img class="thumb" src="'+esc(imgUrl(v))+'" alt="">':'<span style="color:#b0a48c">無</span>')+"</td>";
         }
         else if(n==="published"){
           html+="<td data-label='顯示'>"+(Number(v)?"✅":"—")+"</td>";
@@ -408,7 +410,7 @@ function renderTable(k,panel){
           html+="<td data-label='狀態'>"+(stMap[v]||esc(v||""))+"</td>";
         }
         else if(f&&f.type==="url"&&v){
-          html+="<td data-cell='link'><a class='link-btn' href='"+esc(v)+"' target='_blank' rel='noopener'>開啟 ↗</a></td>";
+          html+="<td data-cell='link'>"+(safeHref(v)?"<a class='link-btn' href='"+esc(safeHref(v))+"' target='_blank' rel='noopener'>開啟 ↗</a>":"<span style='color:#b0a48c'>連結無效</span>")+"</td>";
         }
         else{
           var txt=String(v==null?"":v);
@@ -477,7 +479,7 @@ function openForm(k,id){
       html+='<label>'+f.label+(f.required?' *':'')+'</label>';
       html+='<input type="file" accept="image/*" data-field="'+f.name+'">';
       html+='<input type="hidden" data-field="'+f.name+'" value="'+esc(val)+'">';
-      html+='<div class="preview" data-preview="'+f.name+'">'+(val?'<img src="'+imgUrl(val)+'">':'')+'</div>';
+      html+='<div class="preview" data-preview="'+f.name+'">'+(val?'<img src="'+esc(imgUrl(val))+'">':'')+'</div>';
       html+='<div class="img-note">超過 400KB 會自動壓縮；選新圖後將於儲存時上傳</div>';
     }
     else if(f.type==="textarea"){
